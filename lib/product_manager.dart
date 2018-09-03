@@ -1,31 +1,14 @@
 import 'package:flutter/material.dart';
 
 import './products.dart';
+import './product_control.dart';
 
-class ProductManager extends StatefulWidget {
-  final String startingProduct;
+class ProductManager extends StatelessWidget {
+  final List<Map<String, String>> products;
+  final Function addProduct;
+  final Function deleteProduct;
 
-// Variable inside {} means that a variable should be send with name (useful with multiple variables)
-// ProductManager(startingProduct:'Food Tester')
-  ProductManager({this.startingProduct = "Sweet Tester"});
-  // ProductManager(this.startingProduct)
-
-
-
-  @override
-  State<StatefulWidget> createState() {
-    return _ProductManagerState();
-  }
-}
-
-class _ProductManagerState extends State<ProductManager> {
-  List<String> _products = [];
-
-  @override
-    void initState() {
-      super.initState();
-      _products.add(widget.startingProduct);
-    }
+  ProductManager(this.products, this.addProduct, this.deleteProduct);
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +17,11 @@ class _ProductManagerState extends State<ProductManager> {
       children: <Widget>[
         Container(
           margin: EdgeInsets.all(10.0),
-          child: RaisedButton(
-            //color: Theme.of(context).buttonColor,
-            child: Text('Add Product'),
-            onPressed: () {
-              setState(() {
-                _products.add("Advanced Food Tester");
-              });
-            },
-          ),
+          child: ProductControl(addProduct),
         ),
-        Products(_products)
+        Expanded(
+          child: Products(products, deleteProduct:deleteProduct),
+        )
       ],
     );
   }
