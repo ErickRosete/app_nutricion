@@ -20,51 +20,74 @@ class _AuthPageState extends State<AuthPage> {
       ),
       // body: ProductManager(startingProduct:'Food Tester')
       body: Container(
-        margin: EdgeInsets.all(10.0),
-        child: ListView(
-          children: <Widget>[
-            TextField(
-              decoration: InputDecoration(labelText: 'E-Mail'),
-              keyboardType: TextInputType.emailAddress,
-              onChanged: (String value) {
-                setState(() {
-                  _emailValue = value;
-                });
-              },
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.5),
+              BlendMode.dstATop,
             ),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-              ),
-              onChanged: (String value) {
-                setState(() {
-                  _passwordValue = value;
-                });
-              },
+            image: AssetImage('assets/background.jpg'),
+          ),
+        ),
+        padding: EdgeInsets.all(10.0),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'E-Mail',
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (String value) {
+                    setState(() {
+                      _emailValue = value;
+                    });
+                  },
+                ),               
+                SizedBox(
+                  height: 10.0,
+                ),
+                TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  onChanged: (String value) {
+                    setState(() {
+                      _passwordValue = value;
+                    });
+                  },
+                ),
+                SwitchListTile(
+                  title: Text('Accept terms'),
+                  value: _acceptTerms,
+                  onChanged: (bool value) {
+                    setState(() {
+                      _acceptTerms = value;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                RaisedButton(
+                  child: Text("Login"),
+                  onPressed: () {
+                   // if (_emailValue == "erick@gnerd.guru" &&
+                   //     _passwordValue == "gnerd.guru") {
+                      Navigator.pushReplacementNamed(context, '/products');
+                   // }
+                  },
+                ),
+              ],
             ),
-            SwitchListTile(
-              title: Text('Accept terms'),
-              value: _acceptTerms,
-              onChanged: (bool value) {
-                setState(() {
-                  _acceptTerms = value;
-                });
-              },
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            RaisedButton(
-              child: Text("Login"),
-              onPressed: () {
-                if (_emailValue == "erick@gnerd.guru" &&
-                    _passwordValue == "gnerd.guru") {
-                  Navigator.pushReplacementNamed(context, '/products');
-                }
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );

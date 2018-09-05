@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class ProductPage extends StatelessWidget {
-  final String title;
-  final String imageUrl;
+  final Map<String, dynamic> product;
 
-  ProductPage(this.title, this.imageUrl);
+  ProductPage(this.product);
 
   _showWarningDialog(BuildContext context) {
     showDialog(
@@ -43,25 +42,52 @@ class ProductPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(title),
+          title: Text(product['title']),
         ),
         // body: ProductManager(startingProduct:'Food Tester')
-        body: Column(
-          children: <Widget>[
-            Image.asset(imageUrl),
-            Container(
-              padding: EdgeInsets.all(10.0),
-              child: Text(title),
-            ),
-            Container(
-              padding: EdgeInsets.all(10.0),
-              child: RaisedButton(
-                color: Colors.red,
-                child: Text("DELETE"),
-                onPressed: () => _showWarningDialog(context),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Image.asset(product['image']),
+              Text(
+                product['title'],
+                style: TextStyle(
+                    fontSize: 26.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Oswald'),
               ),
-            ),
-          ],
+              SizedBox(height: 10.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Text(
+                    'Union Square, San Francisco',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontFamily: 'Oswald',
+                    ),
+                  ),
+                  Text(
+                    '\$${product['price'].toString()}',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontFamily: 'Oswald',
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                margin: EdgeInsets.all(10.0),
+                child: Text(
+                  product['description'],
+                  style: TextStyle(
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

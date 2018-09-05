@@ -56,10 +56,10 @@ class _MyAppState extends State<MyApp> {
       ),
 //        home: AuthPage(),
       routes: {
-        '/admin': (BuildContext context) => ProductAdminPage( _addProduct, _deleteProduct),
+        '/admin': (BuildContext context) =>
+            ProductAdminPage(_addProduct, _deleteProduct),
         '/products': (BuildContext context) => ProductsPage(_products),
         '/': (BuildContext context) => AuthPage(),
-
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
@@ -69,16 +69,14 @@ class _MyAppState extends State<MyApp> {
         if (pathElements[1] == 'product') {
           final int index = int.parse(pathElements[2]);
           return MaterialPageRoute<bool>(
-            builder: (BuildContext context) => ProductPage(
-                _products[index]['title'], _products[index]['image']),
+            builder: (BuildContext context) => ProductPage(_products[index]),
           );
         }
         return null;
       },
       onUnknownRoute: (RouteSettings settings) {
         return MaterialPageRoute(
-            builder: (BuildContext context) =>
-                ProductsPage(_products));
+            builder: (BuildContext context) => ProductsPage(_products));
       },
     );
   }
