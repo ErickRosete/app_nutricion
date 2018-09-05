@@ -37,6 +37,13 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void _updateProduct(int index, Map<String, dynamic> product) {
+    setState(() {
+      _products[index] = product;
+    });
+  }
+
+
   void _deleteProduct(int index) {
     setState(() {
       _products.removeAt(index);
@@ -49,6 +56,7 @@ class _MyAppState extends State<MyApp> {
 //      debugShowMaterialGrid: true,
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
+        buttonColor: Colors.deepPurple,
 //        fontFamily: 'Oswald',
 //        brightness: Brightness.light,
 //        accentColor: Colors.deepPurple,
@@ -57,7 +65,7 @@ class _MyAppState extends State<MyApp> {
 //        home: AuthPage(),
       routes: {
         '/admin': (BuildContext context) =>
-            ProductAdminPage(_addProduct, _deleteProduct),
+            ProductAdminPage(_addProduct, _updateProduct, _deleteProduct, _products),
         '/products': (BuildContext context) => ProductsPage(_products),
         '/': (BuildContext context) => AuthPage(),
       },

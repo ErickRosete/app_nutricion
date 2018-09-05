@@ -1,35 +1,32 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import '../widgets/ui_elements/title_default.dart';
+
 class ProductPage extends StatelessWidget {
   final Map<String, dynamic> product;
 
   ProductPage(this.product);
 
-  _showWarningDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Are you sure?'),
-          content: Text('This action cannot be undone!'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('CANCEL'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            FlatButton(
-              child: Text('CONTINUE'),
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context, true);
-              },
-            ),
-          ],
-        );
-      },
+  Widget _buildAddressPriceRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        Text(
+          'Union Square, San Francisco',
+          style: TextStyle(
+            color: Colors.grey,
+            fontFamily: 'Oswald',
+          ),
+        ),
+        Text(
+          '\$${product['price'].toString()}',
+          style: TextStyle(
+            color: Colors.grey,
+            fontFamily: 'Oswald',
+          ),
+        ),
+      ],
     );
   }
 
@@ -49,33 +46,9 @@ class ProductPage extends StatelessWidget {
           child: Column(
             children: <Widget>[
               Image.asset(product['image']),
-              Text(
-                product['title'],
-                style: TextStyle(
-                    fontSize: 26.0,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Oswald'),
-              ),
+              TitleDefault(product['title']),
               SizedBox(height: 10.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Text(
-                    'Union Square, San Francisco',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontFamily: 'Oswald',
-                    ),
-                  ),
-                  Text(
-                    '\$${product['price'].toString()}',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontFamily: 'Oswald',
-                    ),
-                  ),
-                ],
-              ),
+              _buildAddressPriceRow(),
               Container(
                 margin: EdgeInsets.all(10.0),
                 child: Text(
@@ -93,3 +66,30 @@ class ProductPage extends StatelessWidget {
     );
   }
 }
+
+// _showWarningDialog(BuildContext context) {
+//   showDialog(
+//     context: context,
+//     builder: (BuildContext context) {
+//       return AlertDialog(
+//         title: Text('Are you sure?'),
+//         content: Text('This action cannot be undone!'),
+//         actions: <Widget>[
+//           FlatButton(
+//             child: Text('CANCEL'),
+//             onPressed: () {
+//               Navigator.pop(context);
+//             },
+//           ),
+//           FlatButton(
+//             child: Text('CONTINUE'),
+//             onPressed: () {
+//               Navigator.pop(context);
+//               Navigator.pop(context, true);
+//             },
+//           ),
+//         ],
+//       );
+//     },
+//   );
+// }
