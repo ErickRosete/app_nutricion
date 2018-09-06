@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import '../widgets/ui_elements/title_default.dart';
+import '../models/product.dart';
 
 class ProductPage extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Product product;
 
   ProductPage(this.product);
 
@@ -20,7 +21,7 @@ class ProductPage extends StatelessWidget {
           ),
         ),
         Text(
-          '\$${product['price'].toString()}',
+          '\$${product.price.toString()}',
           style: TextStyle(
             color: Colors.grey,
             fontFamily: 'Oswald',
@@ -39,20 +40,20 @@ class ProductPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(product['title']),
+          title: Text(product.title),
         ),
         // body: ProductManager(startingProduct:'Food Tester')
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              Image.asset(product['image']),
-              TitleDefault(product['title']),
+              Image.asset(product.image),
+              TitleDefault(product.title),
               SizedBox(height: 10.0),
               _buildAddressPriceRow(),
               Container(
                 margin: EdgeInsets.all(10.0),
                 child: Text(
-                  product['description'],
+                  product.description,
                   style: TextStyle(
                     color: Colors.grey,
                   ),

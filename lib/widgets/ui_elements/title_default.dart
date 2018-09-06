@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TitleDefault extends StatelessWidget {
-  String title;
+  final String title;
 
   TitleDefault(this.title);
 

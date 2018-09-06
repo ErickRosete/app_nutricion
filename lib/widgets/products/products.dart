@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import './product_card.dart';
+import '../../models/product.dart';
 
 class Products extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+  final List<Product> products;
   // Variable inside [] means can be initialized automatically, and it is not necessarily needed
   Products(this.products);
 
