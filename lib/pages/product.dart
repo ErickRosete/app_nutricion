@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:scoped_model/scoped_model.dart';
 
 import '../widgets/ui_elements/title_default.dart';
+import '../scoped-models/products.dart';
 import '../models/product.dart';
 
 class ProductPage extends StatelessWidget {
-  final Product product;
+  final int index;
 
-  ProductPage(this.product);
+  ProductPage(this.index);
 
-  Widget _buildAddressPriceRow() {
+  Widget _buildAddressPriceRow(Product product) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -38,31 +40,36 @@ class ProductPage extends StatelessWidget {
         Navigator.pop(context, false);
         return Future.value(false);
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(product.title),
-        ),
-        // body: ProductManager(startingProduct:'Food Tester')
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Image.asset(product.image),
-              TitleDefault(product.title),
-              SizedBox(height: 10.0),
-              _buildAddressPriceRow(),
-              Container(
-                margin: EdgeInsets.all(10.0),
-                child: Text(
-                  product.description,
-                  style: TextStyle(
-                    color: Colors.grey,
+      child: ScopedModelDescendant(
+        builder: (BuildContext context, Widget child, ProductsModel model) {
+          final Product product = model.products[index];
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(product.title),
+            ),
+            // body: ProductManager(startingProduct:'Food Tester')
+            body: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Image.asset(product.image),
+                  TitleDefault(product.title),
+                  SizedBox(height: 10.0),
+                  _buildAddressPriceRow(product),
+                  Container(
+                    margin: EdgeInsets.all(10.0),
+                    child: Text(
+                      product.description,
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
                   ),
-                  textAlign: TextAlign.justify,
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

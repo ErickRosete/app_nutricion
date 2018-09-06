@@ -41,6 +41,7 @@ class _AuthPageState extends State<AuthPage> {
         if (value.isEmpty || !RegExp(emailRegExp).hasMatch(value)) {
           return "Please enter a valid E-mail";
         }
+        return null;
       },
       onSaved: (String value) {
         _formData['email'] = value;
@@ -60,6 +61,7 @@ class _AuthPageState extends State<AuthPage> {
         if (value.isEmpty || value.length < 4) {
           return "Invalid Password";
         }
+        return null;
       },
       onSaved: (String value) {
         _formData['password'] = value;
