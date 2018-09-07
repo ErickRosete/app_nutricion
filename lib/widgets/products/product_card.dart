@@ -5,7 +5,7 @@ import './price_tag.dart';
 import './address_tag.dart';
 import '../ui_elements/title_default.dart';
 import '../../models/product.dart';
-import '../../scoped-models/products.dart';
+import '../../scoped-models/main.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -38,16 +38,16 @@ class ProductCard extends StatelessWidget {
                 context, "/product/" + productIndex.toString());
           },
         ),
-        ScopedModelDescendant<ProductsModel>(
-          builder: (BuildContext context, Widget child, ProductsModel model) {
-            IconData favoriteIcon = model.products[productIndex].isFavorite
+        ScopedModelDescendant<MainModel>(
+          builder: (BuildContext context, Widget child, MainModel model) {
+            IconData favoriteIcon = model.getProducts[productIndex].isFavorite
                 ? Icons.favorite
                 : Icons.favorite_border;
             return IconButton(
               icon: Icon(favoriteIcon),
               color: Colors.red,
               onPressed: () {
-                model.selectProduct(productIndex);
+                model.selectProduct(productIndex.toString());
                 model.toggleProductFavoriteStatus();
               },
             );

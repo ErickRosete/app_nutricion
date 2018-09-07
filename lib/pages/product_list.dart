@@ -3,7 +3,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import './product_form.dart';
 import '../models/product.dart';
-import '../scoped-models/products.dart';
+import '../scoped-models/main.dart';
 
 class ProductListPage extends StatelessWidget {
   Widget _buildEditButton(
@@ -16,23 +16,25 @@ class ProductListPage extends StatelessWidget {
           MaterialPageRoute(
             builder: (BuildContext context) => ProductFormPage(),
           ),
-        );
+        ).then((_) {
+          selectProduct(null);
+        });
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget widget, ProductsModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget widget, MainModel model) {
         return ListView.builder(
           itemBuilder: (BuildContext context, int index) {
-            final Product product = model.products[index];
+            final Product product = model.getProducts[index];
             return Dismissible(
               key: Key(product.title),
               onDismissed: (DismissDirection direction) {
                 if (direction == DismissDirection.endToStart) {
-                  model.selectProduct(index);
+                  model.selectProduct(index.toString());
                   model.deleteProduct();
                 }
               },
@@ -53,7 +55,7 @@ class ProductListPage extends StatelessWidget {
               ),
             );
           },
-          itemCount: model.products.length,
+          itemCount: model.getProducts.length,
         );
       },
     );

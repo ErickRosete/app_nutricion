@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../widgets/ui_elements/title_default.dart';
-import '../scoped-models/products.dart';
+import '../scoped-models/main.dart';
 import '../models/product.dart';
 
 class ProductPage extends StatelessWidget {
@@ -41,8 +41,8 @@ class ProductPage extends StatelessWidget {
         return Future.value(false);
       },
       child: ScopedModelDescendant(
-        builder: (BuildContext context, Widget child, ProductsModel model) {
-          final Product product = model.products[index];
+        builder: (BuildContext context, Widget child, MainModel model) {
+          final Product product = model.getProducts[index];
           return Scaffold(
             appBar: AppBar(
               title: Text(product.title),

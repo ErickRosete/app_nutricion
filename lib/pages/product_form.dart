@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../models/product.dart';
-import '../scoped-models/products.dart';
+import '../scoped-models/main.dart';
 
 class ProductFormPage extends StatefulWidget {
   final int productIndex;
@@ -75,32 +75,31 @@ class _ProductFormPageState extends State<ProductFormPage> {
     );
   }
 
-  Widget _buildSubmitButton(ProductsModel model) {
+  Widget _buildSubmitButton(MainModel model) {
     return RaisedButton(
         child: Text("Save"),
         textColor: Colors.white,
-        onPressed: () => _submitForm(
-            model.addProduct, model.updateProduct, model.selectedProductIndex));
+        onPressed: () => _submitForm(model.addProduct, model.updateProduct,
+            model.selectProduct, model.getSelectedProductIndex));
   }
 
-  void _submitForm(Function addProduct, Function updateProduct,
+  void _submitForm(
+      Function addProduct, Function updateProduct, Function selectProduct,
       [int selectedProductIndex]) {
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
-    Product formDataProduct = Product(
-        price: _formData['price'],
-        description: _formData['description'],
-        image: _formData['image'],
-        title: _formData['title'],);        
     if (selectedProductIndex == null) {
-      addProduct(formDataProduct);
+      addProduct(_formData['title'], _formData['description'],
+          _formData['image'], _formData['price']);
     } else {
-      updateProduct(formDataProduct);
+      updateProduct(_formData['title'], _formData['description'],
+          _formData['image'], _formData['price']);
     }
-    Navigator.pushReplacementNamed(context, '/products');
+    Navigator.pushReplacementNamed(context, '/products')
+        .then((_) => selectProduct(null));
   }
 
-  Widget _buildPageContent(BuildContext context, ProductsModel model) {
+  Widget _buildPageContent(BuildContext context, MainModel model) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
     final double targetPadding = deviceWidth - targetWidth;
@@ -133,10 +132,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget child, ProductsModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         Widget pageContent = _buildPageContent(context, model);
-        if (model.selectedProductIndex == null) return pageContent;
+        if (model.getSelectedProductIndex == null) return pageContent;
         return Scaffold(
           appBar: AppBar(
             title: Text("Edit Product"),
