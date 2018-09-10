@@ -76,27 +76,37 @@ class _ProductFormPageState extends State<ProductFormPage> {
   }
 
   Widget _buildSubmitButton(MainModel model) {
-    return RaisedButton(
-        child: Text("Save"),
-        textColor: Colors.white,
-        onPressed: () => _submitForm(model.addProduct, model.updateProduct,
-            model.selectProduct, model.getSelectedProductIndex));
+    return model.isLoading
+        ? Center(child: CircularProgressIndicator())
+        : RaisedButton(
+            child: Text("Save"),
+            textColor: Colors.white,
+            onPressed: () => _submitForm(model.addProduct, model.updateProduct,
+                model.setSelectedProduct, model.getSelectedProductIndex));
   }
 
   void _submitForm(
-      Function addProduct, Function updateProduct, Function selectProduct,
+      Function addProduct, Function updateProduct, Function setSelectedProduct,
       [int selectedProductIndex]) {
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
-    if (selectedProductIndex == null) {
-      addProduct(_formData['title'], _formData['description'],
-          _formData['image'], _formData['price']);
+    if (selectedProductIndex == -1) {
+      addProduct(
+        _formData['title'],
+        _formData['description'],
+        _formData['image'],
+        _formData['price'],
+      ).then((_) => Navigator.pushReplacementNamed(context, '/products')
+          .then((_) => setSelectedProduct(null)));
     } else {
-      updateProduct(_formData['title'], _formData['description'],
-          _formData['image'], _formData['price']);
+      updateProduct(
+        _formData['title'],
+        _formData['description'],
+        _formData['image'],
+        _formData['price'],
+      ).then((_) => Navigator.pushReplacementNamed(context, '/products')
+          .then((_) => setSelectedProduct(null)));
     }
-    Navigator.pushReplacementNamed(context, '/products')
-        .then((_) => selectProduct(null));
   }
 
   Widget _buildPageContent(BuildContext context, MainModel model) {
@@ -135,7 +145,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         Widget pageContent = _buildPageContent(context, model);
-        if (model.getSelectedProductIndex == null) return pageContent;
+        if (model.getSelectedProductIndex == -1) return pageContent;
         return Scaffold(
           appBar: AppBar(
             title: Text("Edit Product"),

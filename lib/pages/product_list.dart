@@ -5,19 +5,37 @@ import './product_form.dart';
 import '../models/product.dart';
 import '../scoped-models/main.dart';
 
-class ProductListPage extends StatelessWidget {
-  Widget _buildEditButton(
-      BuildContext context, int index, Function selectProduct) {
+class ProductListPage extends StatefulWidget {
+  final MainModel model;
+
+  ProductListPage(this.model);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _ProductListPageState();
+  }
+}
+
+class _ProductListPageState extends State<ProductListPage> {
+  @override
+  initState() {
+    super.initState();
+    widget.model.fetchProducts();
+  }
+
+  Widget _buildEditButton(BuildContext context, int index, MainModel model) {
     return IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {
-        selectProduct(index);
-        Navigator.of(context).push(
+        model.setSelectedProduct(model.getProducts[index].id);
+        Navigator.of(context)
+            .push(
           MaterialPageRoute(
             builder: (BuildContext context) => ProductFormPage(),
           ),
-        ).then((_) {
-          selectProduct(null);
+        )
+            .then((_) {
+          model.setSelectedProduct(null);
         });
       },
     );
@@ -33,8 +51,8 @@ class ProductListPage extends StatelessWidget {
             return Dismissible(
               key: Key(product.title),
               onDismissed: (DismissDirection direction) {
-                if (direction == DismissDirection.endToStart) {
-                  model.selectProduct(index.toString());
+                if (direction == DismissDirection.endToStart || direction == DismissDirection.startToEnd) {
+                  model.setSelectedProduct(product.id);
                   model.deleteProduct();
                 }
               },
@@ -43,12 +61,11 @@ class ProductListPage extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: AssetImage(product.image),
+                      backgroundImage: NetworkImage(product.image),
                     ),
                     title: Text(product.title),
                     subtitle: Text('\$${product.price}'),
-                    trailing:
-                        _buildEditButton(context, index, model.selectProduct),
+                    trailing: _buildEditButton(context, index, model),
                   ),
                   Divider(),
                 ],

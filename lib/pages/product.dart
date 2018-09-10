@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:scoped_model/scoped_model.dart';
 
 import '../widgets/ui_elements/title_default.dart';
-import '../scoped-models/main.dart';
 import '../models/product.dart';
 
 class ProductPage extends StatelessWidget {
-  final int index;
+  final Product product;
 
-  ProductPage(this.index);
+  ProductPage(this.product);
 
   Widget _buildAddressPriceRow(Product product) {
     return Row(
@@ -40,36 +38,36 @@ class ProductPage extends StatelessWidget {
         Navigator.pop(context, false);
         return Future.value(false);
       },
-      child: ScopedModelDescendant(
-        builder: (BuildContext context, Widget child, MainModel model) {
-          final Product product = model.getProducts[index];
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(product.title),
-            ),
-            // body: ProductManager(startingProduct:'Food Tester')
-            body: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Image.asset(product.image),
-                  TitleDefault(product.title),
-                  SizedBox(height: 10.0),
-                  _buildAddressPriceRow(product),
-                  Container(
-                    margin: EdgeInsets.all(10.0),
-                    child: Text(
-                      product.description,
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
-                  ),
-                ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(product.title),
+        ),
+        // body: ProductManager(startingProduct:'Food Tester')
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              FadeInImage(
+                image: NetworkImage(product.image),
+                placeholder: AssetImage('assets/food.jpg'),
+                height: 300.0,
+                fit: BoxFit.cover,
               ),
-            ),
-          );
-        },
+              TitleDefault(product.title),
+              SizedBox(height: 10.0),
+              _buildAddressPriceRow(product),
+              Container(
+                margin: EdgeInsets.all(10.0),
+                child: Text(
+                  product.description,
+                  style: TextStyle(
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
