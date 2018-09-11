@@ -85,6 +85,28 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 model.setSelectedProduct, model.getSelectedProductIndex));
   }
 
+  void _errorManagement(bool success, Function setSelectedProduct) {
+    if (success) {
+      Navigator.pushReplacementNamed(context, '/products')
+          .then((_) => setSelectedProduct(null));
+    } else {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Something went wrong'),
+              content: Text('Please try again'),
+              actions: <Widget>[
+                RaisedButton(
+                  child: Text('Ok'),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              ],
+            );
+          });
+    }
+  }
+
   void _submitForm(
       Function addProduct, Function updateProduct, Function setSelectedProduct,
       [int selectedProductIndex]) {
@@ -96,16 +118,18 @@ class _ProductFormPageState extends State<ProductFormPage> {
         _formData['description'],
         _formData['image'],
         _formData['price'],
-      ).then((_) => Navigator.pushReplacementNamed(context, '/products')
-          .then((_) => setSelectedProduct(null)));
+      ).then((bool success) {
+        _errorManagement(success, setSelectedProduct);
+      });
     } else {
       updateProduct(
         _formData['title'],
         _formData['description'],
         _formData['image'],
         _formData['price'],
-      ).then((_) => Navigator.pushReplacementNamed(context, '/products')
-          .then((_) => setSelectedProduct(null)));
+      ).then((bool success) {
+        _errorManagement(success, setSelectedProduct);
+      });
     }
   }
 

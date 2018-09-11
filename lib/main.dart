@@ -26,17 +26,23 @@ void main() {
 class MyApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _MyAppState();
   }
 }
 
 class _MyAppState extends State<MyApp> {
+  final MainModel _model = MainModel();
+
+  @override
+  void initState() {
+    super.initState();
+    _model.autoAuthenticate();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final MainModel model = MainModel();
     return ScopedModel<MainModel>(
-      model: model,
+      model: _model,
       child: MaterialApp(
 //      debugShowMaterialGrid: true,
         theme: ThemeData(
@@ -49,9 +55,10 @@ class _MyAppState extends State<MyApp> {
         ),
 //        home: AuthPage(),
         routes: {
-          '/admin': (BuildContext context) => ProductAdminPage(model),
-          '/products': (BuildContext context) => ProductsPage(model),
-          '/': (BuildContext context) => AuthPage(),
+          '/admin': (BuildContext context) => ProductAdminPage(_model),
+          '/products': (BuildContext context) => ProductsPage(_model),
+          '/': (BuildContext context) =>
+              _model.user == null ? AuthPage() : ProductsPage(_model),
         },
         onGenerateRoute: (RouteSettings settings) {
           final List<String> pathElements = settings.name.split('/');
@@ -60,7 +67,8 @@ class _MyAppState extends State<MyApp> {
           }
           if (pathElements[1] == 'product') {
             final String productId = pathElements[2];
-            final Product product = model.getProducts.firstWhere((Product product){
+            final Product product =
+                _model.getProducts.firstWhere((Product product) {
               return product.id == productId;
             });
             return MaterialPageRoute<bool>(
@@ -71,7 +79,7 @@ class _MyAppState extends State<MyApp> {
         },
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(
-              builder: (BuildContext context) => ProductsPage(model));
+              builder: (BuildContext context) => ProductsPage(_model));
         },
       ),
     );
