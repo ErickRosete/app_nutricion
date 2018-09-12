@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rxdart/subjects.dart';
 
 import '../models/product.dart';
 import '../models/user.dart';
@@ -161,7 +162,7 @@ class ProductsModel extends ConnectedProductsModel {
     }
   }
 
-  Future<bool> fetchProducts() {
+  Future<bool> fetchProducts({bool onlyForUser = false}) {
     _isLoading = true;
     notifyListeners();
 
@@ -180,10 +181,18 @@ class ProductsModel extends ConnectedProductsModel {
               image: productData['image'],
               price: productData['price'],
               userEmail: productData['userEmail'],
-              userId: productData['userId']);
+              userId: productData['userId'],
+              isFavorite: productData['wishlistUsers'] != null
+                  ? (productData['wishlistUsers'] as Map<String, dynamic>)
+                      .containsKey(_authenticatedUser.id)
+                  : false);
           fetchedProductList.add(product);
         });
-        _products = fetchedProductList;
+        _products = onlyForUser
+            ? fetchedProductList.where((Product product) {
+                return product.userId == _authenticatedUser.id;
+              }).toList()
+            : fetchedProductList;
       }
       _isLoading = false;
       notifyListeners();
@@ -195,9 +204,10 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  void toggleProductFavoriteStatus() {
+  Future<bool> toggleProductFavoriteStatus() async {
     final bool isCurrentlyFavorite = selectedProduct.isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
+
     _products[getSelectedProductIndex] = Product(
         id: selectedProduct.id,
         description: selectedProduct.description,
@@ -207,7 +217,37 @@ class ProductsModel extends ConnectedProductsModel {
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
         isFavorite: newFavoriteStatus);
+
+    // _isLoading = true;
+    // notifyListeners();
+    http.Response response;
+    if (newFavoriteStatus) {
+      response = await http.put(
+          'https://flutter-udemy-course.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+          body: json.encode(true));
+    } else {
+      response = await http.delete(
+          'https://flutter-udemy-course.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
+    }
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      // _isLoading = false;
+      // notifyListeners();
+      _products[getSelectedProductIndex] = Product(
+          id: selectedProduct.id,
+          description: selectedProduct.description,
+          image: selectedProduct.image,
+          price: selectedProduct.price,
+          title: selectedProduct.title,
+          userEmail: selectedProduct.userEmail,
+          userId: selectedProduct.userId,
+          isFavorite: !newFavoriteStatus);
+      return false;
+    }
+
+    // _isLoading = false;
     notifyListeners();
+    return true;
   }
 
   void toggleDisplayMode() {
@@ -217,8 +257,15 @@ class ProductsModel extends ConnectedProductsModel {
 }
 
 class UserModel extends ConnectedProductsModel {
+  Timer _authTimer;
+  PublishSubject<bool> _userSubject = PublishSubject();
+
   User get user {
     return _authenticatedUser;
+  }
+
+  PublishSubject get userSubject {
+    return _userSubject;
   }
 
   Future<Map<String, dynamic>> authenticate(
@@ -250,10 +297,16 @@ class UserModel extends ConnectedProductsModel {
           email: email,
           id: responseData['localId'],
           token: responseData['idToken']);
+      _userSubject.add(true);
+      setAuthTimeout(int.parse(responseData['expiresIn']));
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['idToken']);
       prefs.setString('userEmail', email);
       prefs.setString('userId', responseData['localId']);
+      final DateTime now = DateTime.now();
+      final DateTime expiryTime =
+          now.add(Duration(seconds: int.parse(responseData['expiresIn'])));
+      prefs.setString('expiryTime', expiryTime.toIso8601String());
     } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
       message = 'This email already exists';
     } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
@@ -271,23 +324,41 @@ class UserModel extends ConnectedProductsModel {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String token = prefs.getString('token');
     if (token != null) {
-      final String userEmail = prefs.getString('userEmail');
-      final String userId = prefs.getString('userId');
-      _authenticatedUser = User(
-        email: userEmail,
-        id: userId,
-        token: token,
-      );
+      final DateTime now = DateTime.now();
+      final String expiryTimeString = prefs.getString('expiryTime');
+      final DateTime parsedExpiryTime = DateTime.parse(expiryTimeString);
+      if (parsedExpiryTime.isBefore(now)) {
+        //User token already expired
+        _authenticatedUser = null;
+      } else {
+        final String userEmail = prefs.getString('userEmail');
+        final String userId = prefs.getString('userId');
+        _authenticatedUser = User(
+          email: userEmail,
+          id: userId,
+          token: token,
+        );
+        _userSubject.add(true);
+        final int tokenLifeSpan = parsedExpiryTime.difference(now).inSeconds;
+        setAuthTimeout(tokenLifeSpan);
+      }
       notifyListeners();
     }
   }
 
   void logout() async {
     _authenticatedUser = null;
+    _authTimer.cancel();
+    _userSubject.add(false);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
     prefs.remove('userEmail');
     prefs.remove('userId');
+  }
+
+  void setAuthTimeout(int time) {
+    // Logout when token expires
+    _authTimer = Timer(Duration(seconds: time), logout);
   }
 }
 

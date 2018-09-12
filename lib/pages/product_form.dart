@@ -87,7 +87,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
   void _errorManagement(bool success, Function setSelectedProduct) {
     if (success) {
-      Navigator.pushReplacementNamed(context, '/products')
+      Navigator.pushReplacementNamed(context, '/')
           .then((_) => setSelectedProduct(null));
     } else {
       showDialog(

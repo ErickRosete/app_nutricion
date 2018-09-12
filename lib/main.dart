@@ -32,11 +32,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final MainModel _model = MainModel();
+  bool _isAuthenticated = false;
 
   @override
   void initState() {
     super.initState();
     _model.autoAuthenticate();
+    _model.userSubject.listen((dynamic isAuthenticated) {
+      setState(() {
+        _isAuthenticated = isAuthenticated;
+      });
+    });
   }
 
   @override
@@ -55,12 +61,17 @@ class _MyAppState extends State<MyApp> {
         ),
 //        home: AuthPage(),
         routes: {
-          '/admin': (BuildContext context) => ProductAdminPage(_model),
-          '/products': (BuildContext context) => ProductsPage(_model),
+          '/admin': (BuildContext context) =>
+              _isAuthenticated ? ProductAdminPage(_model) : AuthPage(),
           '/': (BuildContext context) =>
-              _model.user == null ? AuthPage() : ProductsPage(_model),
+              _isAuthenticated ? ProductsPage(_model) : AuthPage(),
         },
         onGenerateRoute: (RouteSettings settings) {
+          if (!_isAuthenticated) {
+            return MaterialPageRoute(
+                builder: (BuildContext context) => AuthPage());
+          }
+
           final List<String> pathElements = settings.name.split('/');
           if (pathElements[0] != '') {
             return null;
@@ -72,14 +83,16 @@ class _MyAppState extends State<MyApp> {
               return product.id == productId;
             });
             return MaterialPageRoute<bool>(
-              builder: (BuildContext context) => ProductPage(product),
+              builder: (BuildContext context) =>
+                  _isAuthenticated ? ProductPage(product) : AuthPage(),
             );
           }
           return null;
         },
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(
-              builder: (BuildContext context) => ProductsPage(_model));
+              builder: (BuildContext context) =>
+                  _isAuthenticated ? ProductsPage(_model) : AuthPage());
         },
       ),
     );

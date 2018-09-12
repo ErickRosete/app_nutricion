@@ -20,7 +20,7 @@ class _ProductListPageState extends State<ProductListPage> {
   @override
   initState() {
     super.initState();
-    widget.model.fetchProducts();
+    widget.model.fetchProducts(onlyForUser: true);
   }
 
   Widget _buildEditButton(BuildContext context, int index, MainModel model) {
@@ -51,7 +51,8 @@ class _ProductListPageState extends State<ProductListPage> {
             return Dismissible(
               key: Key(product.title),
               onDismissed: (DismissDirection direction) {
-                if (direction == DismissDirection.endToStart || direction == DismissDirection.startToEnd) {
+                if (direction == DismissDirection.endToStart ||
+                    direction == DismissDirection.startToEnd) {
                   model.setSelectedProduct(product.id);
                   model.deleteProduct();
                 }
