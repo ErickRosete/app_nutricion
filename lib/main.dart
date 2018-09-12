@@ -52,8 +52,8 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
 //      debugShowMaterialGrid: true,
         theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-          buttonColor: Colors.deepPurple,
+          primarySwatch: Colors.green,
+          buttonColor: Colors.greenAccent,
 //        fontFamily: 'Oswald',
 //        brightness: Brightness.light,
 //        accentColor: Colors.deepPurple,

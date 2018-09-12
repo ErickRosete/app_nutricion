@@ -32,7 +32,7 @@ class ConnectedRecipesModel extends Model {
     };
     try {
       final http.Response response = await http.post(
-          'https://flutter-udemy-course.firebaseio.com/Recipes.json?auth=${_authenticatedUser.token}',
+          'https://app-de-nutricion.firebaseio.com/recipes.json?auth=${_authenticatedUser.token}',
           body: json.encode(recipeData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -113,7 +113,7 @@ class RecipesModel extends ConnectedRecipesModel {
 
     return http
         .put(
-            'https://flutter-udemy-course.firebaseio.com/Recipes/${selectedRecipe.id}.json?auth=${_authenticatedUser.token}',
+            'https://app-de-nutricion.firebaseio.com/recipes/${selectedRecipe.id}.json?auth=${_authenticatedUser.token}',
             body: json.encode(updateData))
         .then((http.Response response) {
       Recipe updatedRecipe = Recipe(
@@ -143,7 +143,7 @@ class RecipesModel extends ConnectedRecipesModel {
     notifyListeners();
     return http
         .delete(
-            'https://flutter-udemy-course.firebaseio.com/Recipes/$deletedRecipeId.json?auth=${_authenticatedUser.token}')
+            'https://app-de-nutricion.firebaseio.com/recipes/$deletedRecipeId.json?auth=${_authenticatedUser.token}')
         .then((http.Response response) {
       _isLoading = false;
       notifyListeners();
@@ -168,7 +168,7 @@ class RecipesModel extends ConnectedRecipesModel {
 
     return http
         .get(
-            'https://flutter-udemy-course.firebaseio.com/Recipes.json?auth=${_authenticatedUser.token}')
+            'https://app-de-nutricion.firebaseio.com/recipes.json?auth=${_authenticatedUser.token}')
         .then((http.Response response) {
       final List<Recipe> fetchedRecipeList = [];
       final Map<String, dynamic> recipeListData = json.decode(response.body);
@@ -223,11 +223,11 @@ class RecipesModel extends ConnectedRecipesModel {
     http.Response response;
     if (newFavoriteStatus) {
       response = await http.put(
-          'https://flutter-udemy-course.firebaseio.com/Recipes/${selectedRecipe.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+          'https://app-de-nutricion.firebaseio.com/recipes/${selectedRecipe.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
           body: json.encode(true));
     } else {
       response = await http.delete(
-          'https://flutter-udemy-course.firebaseio.com/Recipes/${selectedRecipe.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
+          'https://app-de-nutricion.firebaseio.com/recipes/${selectedRecipe.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
     }
 
     if (response.statusCode != 200 && response.statusCode != 201) {
@@ -271,8 +271,8 @@ class UserModel extends ConnectedRecipesModel {
   Future<Map<String, dynamic>> authenticate(
       String email, String password, AuthMode _authMode) async {
     String postUrl = _authMode == AuthMode.Login
-        ? 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyDPgk8znrep4Lw19pJ3cCH_27kemPut-2g'
-        : 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyDPgk8znrep4Lw19pJ3cCH_27kemPut-2g';
+        ? 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyCq1CN_FVBqhum73c_sMGuItfzPuLEGLVE'
+        : 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyCq1CN_FVBqhum73c_sMGuItfzPuLEGLVE';
 
     _isLoading = true;
     notifyListeners();

@@ -59,7 +59,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
 
   Widget _buildPriceTextField(Recipe recipe) {
     return TextFormField(
-      initialValue: Recipe == null ? '' : recipe.price.toString(),
+      initialValue: recipe == null ? '' : recipe.price.toString(),
       decoration: InputDecoration(labelText: 'Recipe Price'),
       validator: (String value) {
         if (value.isEmpty ||
