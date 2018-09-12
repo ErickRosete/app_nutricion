@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import '../widgets/products/products.dart';
+import '../widgets/recipes/recipes.dart';
 import '../widgets/ui_elements/logout_list_tile.dart';
 import '../scoped-models/main.dart';
 
-class ProductsPage extends StatefulWidget {
+class RecipesPage extends StatefulWidget {
   final MainModel model;
 
-  ProductsPage(this.model);
+  RecipesPage(this.model);
 
   @override
   State<StatefulWidget> createState() {
-    return _ProductsPageState();
+    return _RecipesPageState();
   }
 }
 
-class _ProductsPageState extends State<ProductsPage> {
+class _RecipesPageState extends State<RecipesPage> {
   @override
   initState() {
     super.initState();
-    widget.model.fetchProducts();
+    widget.model.fetchRecipes();
   }
 
   Widget _buildSideDrawer(BuildContext context) {
@@ -33,7 +33,7 @@ class _ProductsPageState extends State<ProductsPage> {
           ),
           ListTile(
             leading: Icon(Icons.edit),
-            title: Text("Manage Products"),
+            title: Text("Manage Recipes"),
             onTap: () {
               Navigator.pushReplacementNamed(context, '/admin');
             },
@@ -45,16 +45,16 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildProductsList() {
+  Widget _buildRecipesList() {
     return ScopedModelDescendant(
       builder: (BuildContext context, Widget child, MainModel model) {
-        Widget content = Center(child: Text('No Products Found!'));
-        if (model.displayedProducts.length > 0 && !model.isLoading) {
-          content = Products();
+        Widget content = Center(child: Text('No Recipes Found!'));
+        if (model.displayedRecipes.length > 0 && !model.isLoading) {
+          content = Recipes();
         } else if (model.isLoading) {
           content = Center(child: CircularProgressIndicator());
         }
-        return RefreshIndicator(onRefresh: model.fetchProducts, child: content);
+        return RefreshIndicator(onRefresh: model.fetchRecipes, child: content);
       },
     );
   }
@@ -81,8 +81,8 @@ class _ProductsPageState extends State<ProductsPage> {
           ),
         ],
       ),
-      // body: ProductManager(startingProduct:'Food Tester')
-      body: _buildProductsList(),
+      // body: RecipeManager(startingRecipe:'Food Tester')
+      body: _buildRecipesList(),
     );
   }
 }

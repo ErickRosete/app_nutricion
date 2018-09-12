@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Product {
+class Ingredient {
   final String id;
   final String title;
   final String description;
@@ -10,7 +10,7 @@ class Product {
   final String userEmail;
   final String userId;
 
-  Product(
+  Ingredient(
       {@required this.id,
       @required this.title,
       @required this.description,

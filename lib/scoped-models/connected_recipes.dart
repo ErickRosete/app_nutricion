@@ -6,22 +6,22 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/subjects.dart';
 
-import '../models/product.dart';
+import '../models/recipe.dart';
 import '../models/user.dart';
 import '../models/auth.dart';
 
-class ConnectedProductsModel extends Model {
-  List<Product> _products = [];
-  String _selectedProductId;
+class ConnectedRecipesModel extends Model {
+  List<Recipe> _recipes = [];
+  String _selectedRecipeId;
   User _authenticatedUser;
   bool _isLoading = false;
 
-  Future<bool> addProduct(
+  Future<bool> addRecipe(
       String title, String description, String image, double price) async {
     _isLoading = true;
     notifyListeners();
 
-    final Map<String, dynamic> productData = {
+    final Map<String, dynamic> recipeData = {
       'title': title,
       'description': description,
       'image':
@@ -32,8 +32,8 @@ class ConnectedProductsModel extends Model {
     };
     try {
       final http.Response response = await http.post(
-          'https://flutter-udemy-course.firebaseio.com/products.json?auth=${_authenticatedUser.token}',
-          body: json.encode(productData));
+          'https://flutter-udemy-course.firebaseio.com/Recipes.json?auth=${_authenticatedUser.token}',
+          body: json.encode(recipeData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         _isLoading = false;
@@ -42,7 +42,7 @@ class ConnectedProductsModel extends Model {
       }
 
       final Map<String, dynamic> responseData = json.decode(response.body);
-      Product newProduct = Product(
+      Recipe newRecipe = Recipe(
           id: responseData['name'],
           title: title,
           description: description,
@@ -50,7 +50,7 @@ class ConnectedProductsModel extends Model {
           price: price,
           userEmail: _authenticatedUser.email,
           userId: _authenticatedUser.id);
-      _products.add(newProduct);
+      _recipes.add(newRecipe);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -62,26 +62,26 @@ class ConnectedProductsModel extends Model {
   }
 }
 
-class ProductsModel extends ConnectedProductsModel {
+class RecipesModel extends ConnectedRecipesModel {
   bool _showFavorites = false;
 
-  List<Product> get getProducts {
-    return List.from(_products);
+  List<Recipe> get getRecipes {
+    return List.from(_recipes);
   }
 
-  List<Product> get displayedProducts {
+  List<Recipe> get displayedRecipes {
     if (_showFavorites)
-      return _products.where((Product product) => product.isFavorite).toList();
-    return List.from(_products);
+      return _recipes.where((Recipe recipe) => recipe.isFavorite).toList();
+    return List.from(_recipes);
   }
 
-  String get getSelectedProductId {
-    return _selectedProductId;
+  String get getSelectedRecipeId {
+    return _selectedRecipeId;
   }
 
-  int get getSelectedProductIndex {
-    return _products.indexWhere((Product product) {
-      return product.id == _selectedProductId;
+  int get getSelectedRecipeIndex {
+    return _recipes.indexWhere((Recipe recipe) {
+      return recipe.id == _selectedRecipeId;
     });
   }
 
@@ -89,14 +89,14 @@ class ProductsModel extends ConnectedProductsModel {
     return _showFavorites;
   }
 
-  Product get selectedProduct {
-    if (_selectedProductId == null) return null;
-    return _products.firstWhere((Product product) {
-      return product.id == _selectedProductId;
+  Recipe get selectedRecipe {
+    if (_selectedRecipeId == null) return null;
+    return _recipes.firstWhere((Recipe recipe) {
+      return recipe.id == _selectedRecipeId;
     });
   }
 
-  Future<bool> updateProduct(
+  Future<bool> updateRecipe(
       String title, String description, String image, double price) {
     _isLoading = true;
     notifyListeners();
@@ -107,24 +107,24 @@ class ProductsModel extends ConnectedProductsModel {
       'image':
           'http://as01.epimg.net/deporteyvida/imagenes/2018/05/07/portada/1525714597_852564_1525714718_noticia_normal.jpg',
       'price': price,
-      'userEmail': selectedProduct.userEmail,
-      'userId': selectedProduct.userId
+      'userEmail': selectedRecipe.userEmail,
+      'userId': selectedRecipe.userId
     };
 
     return http
         .put(
-            'https://flutter-udemy-course.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
+            'https://flutter-udemy-course.firebaseio.com/Recipes/${selectedRecipe.id}.json?auth=${_authenticatedUser.token}',
             body: json.encode(updateData))
         .then((http.Response response) {
-      Product updatedProduct = Product(
-          id: selectedProduct.id,
+      Recipe updatedRecipe = Recipe(
+          id: selectedRecipe.id,
           title: title,
           description: description,
           image: image,
           price: price,
-          userEmail: selectedProduct.userEmail,
-          userId: selectedProduct.userId);
-      _products[getSelectedProductIndex] = updatedProduct;
+          userEmail: selectedRecipe.userEmail,
+          userId: selectedRecipe.userId);
+      _recipes[getSelectedRecipeIndex] = updatedRecipe;
       _isLoading = false;
       notifyListeners();
       return true;
@@ -135,15 +135,15 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  Future<bool> deleteProduct() {
+  Future<bool> deleteRecipe() {
     _isLoading = true;
-    final String deletedProductId = selectedProduct.id;
-    _products.removeAt(getSelectedProductIndex);
-    _selectedProductId = null;
+    final String deletedRecipeId = selectedRecipe.id;
+    _recipes.removeAt(getSelectedRecipeIndex);
+    _selectedRecipeId = null;
     notifyListeners();
     return http
         .delete(
-            'https://flutter-udemy-course.firebaseio.com/products/$deletedProductId.json?auth=${_authenticatedUser.token}')
+            'https://flutter-udemy-course.firebaseio.com/Recipes/$deletedRecipeId.json?auth=${_authenticatedUser.token}')
         .then((http.Response response) {
       _isLoading = false;
       notifyListeners();
@@ -155,44 +155,44 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  void setSelectedProduct(String productId) {
-    _selectedProductId = productId;
-    if (productId != null) {
+  void setSelectedRecipe(String recipeId) {
+    _selectedRecipeId = recipeId;
+    if (recipeId != null) {
       notifyListeners();
     }
   }
 
-  Future<bool> fetchProducts({bool onlyForUser = false}) {
+  Future<bool> fetchRecipes({bool onlyForUser = false}) {
     _isLoading = true;
     notifyListeners();
 
     return http
         .get(
-            'https://flutter-udemy-course.firebaseio.com/products.json?auth=${_authenticatedUser.token}')
+            'https://flutter-udemy-course.firebaseio.com/Recipes.json?auth=${_authenticatedUser.token}')
         .then((http.Response response) {
-      final List<Product> fetchedProductList = [];
-      final Map<String, dynamic> productListData = json.decode(response.body);
-      if (productListData != null) {
-        productListData.forEach((String productId, dynamic productData) {
-          final Product product = Product(
-              id: productId,
-              title: productData['title'],
-              description: productData['description'],
-              image: productData['image'],
-              price: productData['price'],
-              userEmail: productData['userEmail'],
-              userId: productData['userId'],
-              isFavorite: productData['wishlistUsers'] != null
-                  ? (productData['wishlistUsers'] as Map<String, dynamic>)
+      final List<Recipe> fetchedRecipeList = [];
+      final Map<String, dynamic> recipeListData = json.decode(response.body);
+      if (recipeListData != null) {
+        recipeListData.forEach((String recipeId, dynamic recipeData) {
+          final Recipe recipe = Recipe(
+              id: recipeId,
+              title: recipeData['title'],
+              description: recipeData['description'],
+              image: recipeData['image'],
+              price: recipeData['price'],
+              userEmail: recipeData['userEmail'],
+              userId: recipeData['userId'],
+              isFavorite: recipeData['wishlistUsers'] != null
+                  ? (recipeData['wishlistUsers'] as Map<String, dynamic>)
                       .containsKey(_authenticatedUser.id)
                   : false);
-          fetchedProductList.add(product);
+          fetchedRecipeList.add(recipe);
         });
-        _products = onlyForUser
-            ? fetchedProductList.where((Product product) {
-                return product.userId == _authenticatedUser.id;
+        _recipes = onlyForUser
+            ? fetchedRecipeList.where((Recipe recipe) {
+                return recipe.userId == _authenticatedUser.id;
               }).toList()
-            : fetchedProductList;
+            : fetchedRecipeList;
       }
       _isLoading = false;
       notifyListeners();
@@ -204,18 +204,18 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  Future<bool> toggleProductFavoriteStatus() async {
-    final bool isCurrentlyFavorite = selectedProduct.isFavorite;
+  Future<bool> toggleRecipeFavoriteStatus() async {
+    final bool isCurrentlyFavorite = selectedRecipe.isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
 
-    _products[getSelectedProductIndex] = Product(
-        id: selectedProduct.id,
-        description: selectedProduct.description,
-        image: selectedProduct.image,
-        price: selectedProduct.price,
-        title: selectedProduct.title,
-        userEmail: selectedProduct.userEmail,
-        userId: selectedProduct.userId,
+    _recipes[getSelectedRecipeIndex] = Recipe(
+        id: selectedRecipe.id,
+        description: selectedRecipe.description,
+        image: selectedRecipe.image,
+        price: selectedRecipe.price,
+        title: selectedRecipe.title,
+        userEmail: selectedRecipe.userEmail,
+        userId: selectedRecipe.userId,
         isFavorite: newFavoriteStatus);
 
     // _isLoading = true;
@@ -223,24 +223,24 @@ class ProductsModel extends ConnectedProductsModel {
     http.Response response;
     if (newFavoriteStatus) {
       response = await http.put(
-          'https://flutter-udemy-course.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+          'https://flutter-udemy-course.firebaseio.com/Recipes/${selectedRecipe.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
           body: json.encode(true));
     } else {
       response = await http.delete(
-          'https://flutter-udemy-course.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
+          'https://flutter-udemy-course.firebaseio.com/Recipes/${selectedRecipe.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
     }
 
     if (response.statusCode != 200 && response.statusCode != 201) {
       // _isLoading = false;
       // notifyListeners();
-      _products[getSelectedProductIndex] = Product(
-          id: selectedProduct.id,
-          description: selectedProduct.description,
-          image: selectedProduct.image,
-          price: selectedProduct.price,
-          title: selectedProduct.title,
-          userEmail: selectedProduct.userEmail,
-          userId: selectedProduct.userId,
+      _recipes[getSelectedRecipeIndex] = Recipe(
+          id: selectedRecipe.id,
+          description: selectedRecipe.description,
+          image: selectedRecipe.image,
+          price: selectedRecipe.price,
+          title: selectedRecipe.title,
+          userEmail: selectedRecipe.userEmail,
+          userId: selectedRecipe.userId,
           isFavorite: !newFavoriteStatus);
       return false;
     }
@@ -256,7 +256,7 @@ class ProductsModel extends ConnectedProductsModel {
   }
 }
 
-class UserModel extends ConnectedProductsModel {
+class UserModel extends ConnectedRecipesModel {
   Timer _authTimer;
   PublishSubject<bool> _userSubject = PublishSubject();
 
@@ -362,7 +362,7 @@ class UserModel extends ConnectedProductsModel {
   }
 }
 
-class UtilityModel extends ConnectedProductsModel {
+class UtilityModel extends ConnectedRecipesModel {
   bool get isLoading {
     return _isLoading;
   }

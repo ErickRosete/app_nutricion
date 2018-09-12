@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import '../models/product.dart';
+import '../models/recipe.dart';
 import '../scoped-models/main.dart';
 
-class ProductFormPage extends StatefulWidget {
-  final int productIndex;
+class RecipeFormPage extends StatefulWidget {
+  final int recipeIndex;
 
-  ProductFormPage({this.productIndex});
+  RecipeFormPage({this.recipeIndex});
 
   @override
   State<StatefulWidget> createState() {
-    return _ProductFormPageState();
+    return _RecipeFormPageState();
   }
 }
 
-class _ProductFormPageState extends State<ProductFormPage> {
+class _RecipeFormPageState extends State<RecipeFormPage> {
   final Map<String, dynamic> _formData = {
     'title': null,
     'description': null,
@@ -24,10 +24,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  Widget _buildTitleTextField(Product product) {
+  Widget _buildTitleTextField(Recipe recipe) {
     return TextFormField(
-      initialValue: product == null ? '' : product.title,
-      decoration: InputDecoration(labelText: 'Product Title'),
+      initialValue: recipe == null ? '' : recipe.title,
+      decoration: InputDecoration(labelText: 'Recipe Title'),
       validator: (String value) {
         if (value.isEmpty || value.length < 5) {
           return 'Title is required and should be 5+ characters long.';
@@ -40,11 +40,11 @@ class _ProductFormPageState extends State<ProductFormPage> {
     );
   }
 
-  Widget _buildDescriptionTextField(Product product) {
+  Widget _buildDescriptionTextField(Recipe recipe) {
     return TextFormField(
       maxLines: 4,
-      initialValue: product == null ? '' : product.description,
-      decoration: InputDecoration(labelText: 'Product Description'),
+      initialValue: recipe == null ? '' : recipe.description,
+      decoration: InputDecoration(labelText: 'Recipe Description'),
       validator: (String value) {
         if (value.isEmpty || value.length < 10) {
           return 'Description is required and should be 10+ characters long.';
@@ -57,10 +57,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
     );
   }
 
-  Widget _buildPriceTextField(Product product) {
+  Widget _buildPriceTextField(Recipe recipe) {
     return TextFormField(
-      initialValue: product == null ? '' : product.price.toString(),
-      decoration: InputDecoration(labelText: 'Product Price'),
+      initialValue: Recipe == null ? '' : recipe.price.toString(),
+      decoration: InputDecoration(labelText: 'Recipe Price'),
       validator: (String value) {
         if (value.isEmpty ||
             !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
@@ -81,14 +81,14 @@ class _ProductFormPageState extends State<ProductFormPage> {
         : RaisedButton(
             child: Text("Save"),
             textColor: Colors.white,
-            onPressed: () => _submitForm(model.addProduct, model.updateProduct,
-                model.setSelectedProduct, model.getSelectedProductIndex));
+            onPressed: () => _submitForm(model.addRecipe, model.updateRecipe,
+                model.setSelectedRecipe, model.getSelectedRecipeIndex));
   }
 
-  void _errorManagement(bool success, Function setSelectedProduct) {
+  void _errorManagement(bool success, Function setSelectedRecipe) {
     if (success) {
       Navigator.pushReplacementNamed(context, '/')
-          .then((_) => setSelectedProduct(null));
+          .then((_) => setSelectedRecipe(null));
     } else {
       showDialog(
           context: context,
@@ -108,27 +108,27 @@ class _ProductFormPageState extends State<ProductFormPage> {
   }
 
   void _submitForm(
-      Function addProduct, Function updateProduct, Function setSelectedProduct,
-      [int selectedProductIndex]) {
+      Function addRecipe, Function updateRecipe, Function setSelectedRecipe,
+      [int selectedRecipeIndex]) {
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
-    if (selectedProductIndex == -1) {
-      addProduct(
+    if (selectedRecipeIndex == -1) {
+      addRecipe(
         _formData['title'],
         _formData['description'],
         _formData['image'],
         _formData['price'],
       ).then((bool success) {
-        _errorManagement(success, setSelectedProduct);
+        _errorManagement(success, setSelectedRecipe);
       });
     } else {
-      updateProduct(
+      updateRecipe(
         _formData['title'],
         _formData['description'],
         _formData['image'],
         _formData['price'],
       ).then((bool success) {
-        _errorManagement(success, setSelectedProduct);
+        _errorManagement(success, setSelectedRecipe);
       });
     }
   }
@@ -137,7 +137,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
     final double targetPadding = deviceWidth - targetWidth;
-    final Product product = model.selectedProduct;
+    final Recipe recipe = model.selectedRecipe;
 
     return GestureDetector(
       onTap: () {
@@ -150,9 +150,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
           child: ListView(
             padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
             children: <Widget>[
-              _buildTitleTextField(product),
-              _buildDescriptionTextField(product),
-              _buildPriceTextField(product),
+              _buildTitleTextField(recipe),
+              _buildDescriptionTextField(recipe),
+              _buildPriceTextField(recipe),
               SizedBox(
                 height: 10.0,
               ),
@@ -169,10 +169,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         Widget pageContent = _buildPageContent(context, model);
-        if (model.getSelectedProductIndex == -1) return pageContent;
+        if (model.getSelectedRecipeIndex == -1) return pageContent;
         return Scaffold(
           appBar: AppBar(
-            title: Text("Edit Product"),
+            title: Text("Edit Recipe"),
           ),
           body: pageContent,
         );
@@ -193,7 +193,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
 ///////////////////////////////Modal/////////////////////////////////////
 //  Center(
 //   child: RaisedButton(
-//     child: Text("Create a product"),
+//     child: Text("Create a Recipe"),
 //     onPressed: () {
 //       showModalBottomSheet(
 //           context: context,

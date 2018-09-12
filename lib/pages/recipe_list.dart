@@ -1,41 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import './product_form.dart';
-import '../models/product.dart';
+import './recipe_form.dart';
+import '../models/recipe.dart';
 import '../scoped-models/main.dart';
 
-class ProductListPage extends StatefulWidget {
+class RecipeListPage extends StatefulWidget {
   final MainModel model;
 
-  ProductListPage(this.model);
+  RecipeListPage(this.model);
 
   @override
   State<StatefulWidget> createState() {
-    return _ProductListPageState();
+    return _RecipeListPageState();
   }
 }
 
-class _ProductListPageState extends State<ProductListPage> {
+class _RecipeListPageState extends State<RecipeListPage> {
   @override
   initState() {
     super.initState();
-    widget.model.fetchProducts(onlyForUser: true);
+    widget.model.fetchRecipes(onlyForUser: true);
   }
 
   Widget _buildEditButton(BuildContext context, int index, MainModel model) {
     return IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {
-        model.setSelectedProduct(model.getProducts[index].id);
+        model.setSelectedRecipe(model.getRecipes[index].id);
         Navigator.of(context)
             .push(
           MaterialPageRoute(
-            builder: (BuildContext context) => ProductFormPage(),
+            builder: (BuildContext context) => RecipeFormPage(),
           ),
         )
             .then((_) {
-          model.setSelectedProduct(null);
+          model.setSelectedRecipe(null);
         });
       },
     );
@@ -47,14 +47,14 @@ class _ProductListPageState extends State<ProductListPage> {
       builder: (BuildContext context, Widget widget, MainModel model) {
         return ListView.builder(
           itemBuilder: (BuildContext context, int index) {
-            final Product product = model.getProducts[index];
+            final Recipe recipe = model.getRecipes[index];
             return Dismissible(
-              key: Key(product.title),
+              key: Key(recipe.title),
               onDismissed: (DismissDirection direction) {
                 if (direction == DismissDirection.endToStart ||
                     direction == DismissDirection.startToEnd) {
-                  model.setSelectedProduct(product.id);
-                  model.deleteProduct();
+                  model.setSelectedRecipe(recipe.id);
+                  model.deleteRecipe();
                 }
               },
               background: Container(color: Colors.red),
@@ -62,10 +62,10 @@ class _ProductListPageState extends State<ProductListPage> {
                 children: <Widget>[
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(product.image),
+                      backgroundImage: NetworkImage(recipe.image),
                     ),
-                    title: Text(product.title),
-                    subtitle: Text('\$${product.price}'),
+                    title: Text(recipe.title),
+                    subtitle: Text('\$${recipe.price}'),
                     trailing: _buildEditButton(context, index, model),
                   ),
                   Divider(),
@@ -73,7 +73,7 @@ class _ProductListPageState extends State<ProductListPage> {
               ),
             );
           },
-          itemCount: model.getProducts.length,
+          itemCount: model.getRecipes.length,
         );
       },
     );

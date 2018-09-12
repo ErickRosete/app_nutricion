@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 //import 'package:flutter/rendering.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import './pages/products.dart';
-import './pages/product.dart';
+import './pages/recipes.dart';
+import './pages/recipe.dart';
 import './pages/auth.dart';
-import './pages/products_admin.dart';
+import './pages/recipes_admin.dart';
 import './scoped-models/main.dart';
-import './models/product.dart';
+import './models/recipe.dart';
 
 // void main() => runApp(MyApp());
 
@@ -62,9 +62,9 @@ class _MyAppState extends State<MyApp> {
 //        home: AuthPage(),
         routes: {
           '/admin': (BuildContext context) =>
-              _isAuthenticated ? ProductAdminPage(_model) : AuthPage(),
+              _isAuthenticated ? RecipeAdminPage(_model) : AuthPage(),
           '/': (BuildContext context) =>
-              _isAuthenticated ? ProductsPage(_model) : AuthPage(),
+              _isAuthenticated ? RecipesPage(_model) : AuthPage(),
         },
         onGenerateRoute: (RouteSettings settings) {
           if (!_isAuthenticated) {
@@ -76,15 +76,15 @@ class _MyAppState extends State<MyApp> {
           if (pathElements[0] != '') {
             return null;
           }
-          if (pathElements[1] == 'product') {
-            final String productId = pathElements[2];
-            final Product product =
-                _model.getProducts.firstWhere((Product product) {
-              return product.id == productId;
+          if (pathElements[1] == 'Recipe') {
+            final String recipeId = pathElements[2];
+            final Recipe recipe =
+                _model.getRecipes.firstWhere((Recipe recipe) {
+              return recipe.id == recipeId;
             });
             return MaterialPageRoute<bool>(
               builder: (BuildContext context) =>
-                  _isAuthenticated ? ProductPage(product) : AuthPage(),
+                  _isAuthenticated ? RecipePage(recipe) : AuthPage(),
             );
           }
           return null;
@@ -92,7 +92,7 @@ class _MyAppState extends State<MyApp> {
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(
               builder: (BuildContext context) =>
-                  _isAuthenticated ? ProductsPage(_model) : AuthPage());
+                  _isAuthenticated ? RecipesPage(_model) : AuthPage());
         },
       ),
     );

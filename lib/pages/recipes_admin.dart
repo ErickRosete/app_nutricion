@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../scoped-models/main.dart';
-import './product_form.dart';
-import './product_list.dart';
+import './recipe_form.dart';
+import './recipe_list.dart';
 import '../widgets/ui_elements/logout_list_tile.dart';
 
-class ProductAdminPage extends StatelessWidget {
+class RecipeAdminPage extends StatelessWidget {
   final MainModel model;
 
-  ProductAdminPage(this.model);
+  RecipeAdminPage(this.model);
 
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
@@ -20,7 +20,7 @@ class ProductAdminPage extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.shop),
-            title: Text("Products list"),
+            title: Text("Recipes list"),
             onTap: () {
               Navigator.pushReplacementNamed(context, '/');
             },
@@ -39,23 +39,23 @@ class ProductAdminPage extends StatelessWidget {
       child: Scaffold(
         drawer: _buildSideDrawer(context),
         appBar: AppBar(
-          title: Text('Product Manager'),
+          title: Text('Recipe Manager'),
           bottom: TabBar(tabs: <Widget>[
             Tab(
               icon: Icon(Icons.create),
-              text: 'Create Product',
+              text: 'Create Recipe',
             ),
             Tab(
               icon: Icon(Icons.list),
-              text: 'My Products',
+              text: 'My Recipes',
             ),
           ]),
         ),
-        // body: ProductManager(startingProduct:'Food Tester')
+        // body: RecipeManager(startingRecipe:'Food Tester')
         body: TabBarView(
           children: <Widget>[
-            ProductFormPage(),
-            ProductListPage(model),
+            RecipeFormPage(),
+            RecipeListPage(model),
           ],
         ),
       ),

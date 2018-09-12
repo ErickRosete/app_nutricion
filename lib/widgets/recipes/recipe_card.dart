@@ -4,24 +4,24 @@ import 'package:scoped_model/scoped_model.dart';
 import './price_tag.dart';
 import './address_tag.dart';
 import '../ui_elements/title_default.dart';
-import '../../models/product.dart';
+import '../../models/recipe.dart';
 import '../../scoped-models/main.dart';
 
-class ProductCard extends StatelessWidget {
-  final Product product;
-  final int productIndex;
+class RecipeCard extends StatelessWidget {
+  final Recipe recipe;
+  final int recipeIndex;
 
-  ProductCard(this.product, this.productIndex);
+  RecipeCard(this.recipe, this.recipeIndex);
 
   Widget _buildTitlePriceRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        TitleDefault(product.title),
+        TitleDefault(recipe.title),
         SizedBox(
           width: 8.0,
         ),
-        PriceTag(product.price.toString()),
+        PriceTag(recipe.price.toString()),
       ],
     );
   }
@@ -37,17 +37,17 @@ class ProductCard extends StatelessWidget {
               color: Colors.blue,
               onPressed: () {
                 Navigator.pushNamed<bool>(
-                    context, "/product/" + model.getProducts[productIndex].id);
+                    context, "/Recipe/" + model.getRecipes[recipeIndex].id);
               },
             ),
             IconButton(
-              icon: Icon(model.getProducts[productIndex].isFavorite
+              icon: Icon(model.getRecipes[recipeIndex].isFavorite
                   ? Icons.favorite
                   : Icons.favorite_border),
               color: Colors.red,
               onPressed: () {
-                model.setSelectedProduct(model.getProducts[productIndex].id);
-                model.toggleProductFavoriteStatus();
+                model.setSelectedRecipe(model.getRecipes[recipeIndex].id);
+                model.toggleRecipeFavoriteStatus();
               },
             ),
           ],
@@ -63,7 +63,7 @@ class ProductCard extends StatelessWidget {
       child: Column(
         children: <Widget>[
           FadeInImage(
-            image: NetworkImage(product.image),
+            image: NetworkImage(recipe.image),
             placeholder: AssetImage('assets/food.jpg'),
             height: 300.0,
             fit: BoxFit.cover,

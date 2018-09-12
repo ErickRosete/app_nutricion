@@ -1,0 +1,91 @@
+Flutter crash report; please file at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter run
+
+## exception
+
+FileSystemException: FileSystemException: Cannot copy file to 'C:\Users\Erick Rosete\flutter\app_nutricion\build\app\outputs\apk\app.apk', path = 'C:\Users\Erick Rosete\flutter\app_nutricion\build\app\outputs\apk\debug\app-debug.apk' (OS Error: There is not enough space on the disk.
+, errno = 112)
+
+```
+#0      _File.throwIfError (dart:io/file_impl.dart:647:7)
+#1      _File.copySync (dart:io/file_impl.dart:352:5)
+#2      _LocalFile&LocalFileSystemEntity&ForwardingFile.copySync (package:file/src/forwarding/forwarding_file.dart:29:50)
+#3      _buildGradleProjectV2 (package:flutter_tools/src/android/gradle.dart:396:11)
+<asynchronous suspension>
+#4      buildGradleProject (package:flutter_tools/src/android/gradle.dart:296:14)
+<asynchronous suspension>
+#5      buildApk (package:flutter_tools/src/android/apk.dart:41:10)
+<asynchronous suspension>
+#6      AndroidDevice.startApp (package:flutter_tools/src/android/android_device.dart:378:13)
+<asynchronous suspension>
+#7      FlutterDevice.runHot (package:flutter_tools/src/resident_runner.dart:292:54)
+<asynchronous suspension>
+#8      HotRunner.run (package:flutter_tools/src/run_hot.dart:259:39)
+<asynchronous suspension>
+#9      RunCommand.runCommand (package:flutter_tools/src/commands/run.dart:411:37)
+<asynchronous suspension>
+#10     FlutterCommand.verifyThenRunCommand (package:flutter_tools/src/runner/flutter_command.dart:356:18)
+#11     _asyncThenWrapperHelper.<anonymous closure> (dart:async/runtime/libasync_patch.dart:77:64)
+#12     _rootRunUnary (dart:async/zone.dart:1132:38)
+#13     _CustomZone.runUnary (dart:async/zone.dart:1029:19)
+#14     _FutureListener.handleValue (dart:async/future_impl.dart:129:18)
+#15     Future._propagateToListeners.handleValueCallback (dart:async/future_impl.dart:642:45)
+#16     Future._propagateToListeners (dart:async/future_impl.dart:671:32)
+#17     Future._complete (dart:async/future_impl.dart:476:7)
+#18     _SyncCompleter.complete (dart:async/future_impl.dart:51:12)
+#19     _AsyncAwaitCompleter.complete (dart:async/runtime/libasync_patch.dart:28:18)
+#20     _completeOnAsyncReturn (dart:async/runtime/libasync_patch.dart:295:13)
+#21     RunCommand.usageValues (package:flutter_tools/src/commands/run.dart)
+#22     _asyncThenWrapperHelper.<anonymous closure> (dart:async/runtime/libasync_patch.dart:77:64)
+#23     _rootRunUnary (dart:async/zone.dart:1132:38)
+#24     _CustomZone.runUnary (dart:async/zone.dart:1029:19)
+#25     _FutureListener.handleValue (dart:async/future_impl.dart:129:18)
+#26     Future._propagateToListeners.handleValueCallback (dart:async/future_impl.dart:642:45)
+#27     Future._propagateToListeners (dart:async/future_impl.dart:671:32)
+#28     Future._complete (dart:async/future_impl.dart:476:7)
+#29     _SyncCompleter.complete (dart:async/future_impl.dart:51:12)
+#30     _AsyncAwaitCompleter.complete.<anonymous closure> (dart:async/runtime/libasync_patch.dart:33:20)
+#31     _rootRun (dart:async/zone.dart:1124:13)
+#32     _CustomZone.run (dart:async/zone.dart:1021:19)
+#33     _CustomZone.bindCallback.<anonymous closure> (dart:async/zone.dart:947:23)
+#34     _microtaskLoop (dart:async/schedule_microtask.dart:41:21)
+#35     _startMicrotaskLoop (dart:async/schedule_microtask.dart:50:5)
+#36     _runPendingImmediateCallback (dart:isolate/runtime/libisolate_patch.dart:115:13)
+#37     _RawReceivePortImpl._handleMessage (dart:isolate/runtime/libisolate_patch.dart:172:5)
+```
+
+## flutter doctor
+
+```
+[✓] Flutter (Channel beta, v0.7.3, on Microsoft Windows [Version 10.0.17134.228], locale en-US)
+    • Flutter version 0.7.3 at C:\src\flutter
+    • Framework revision 3b309bda07 (2 weeks ago), 2018-08-28 12:39:24 -0700
+    • Engine revision af42b6dc95
+    • Dart version 2.1.0-dev.1.0.flutter-ccb16f7282
+
+[✓] Android toolchain - develop for Android devices (Android SDK 28.0.2)
+    • Android SDK at C:\Users\Erick Rosete\AppData\Local\Android\sdk
+    • Android NDK location not configured (optional; useful for native profiling support)
+    • Platform android-28, build-tools 28.0.2
+    • Java binary at: C:\Program Files\Android\Android Studio\jre\bin\java
+    • Java version OpenJDK Runtime Environment (build 1.8.0_152-release-1024-b02)
+    • All Android licenses accepted.
+
+[✓] Android Studio (version 3.1)
+    • Android Studio at C:\Program Files\Android\Android Studio
+    • Flutter plugin version 27.1.1
+    • Dart plugin version 173.4700
+    • Java version OpenJDK Runtime Environment (build 1.8.0_152-release-1024-b02)
+
+[✓] VS Code, 64-bit edition (version 1.26.1)
+    • VS Code at C:\Program Files\Microsoft VS Code
+    • Flutter extension version 2.18.0
+
+[✓] Connected devices (1 available)
+    • Android SDK built for x86 • emulator-5554 • android-x86 • Android 8.1.0 (API 27) (emulator)
+
+• No issues found!
+```

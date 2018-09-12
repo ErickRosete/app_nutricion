@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import '../widgets/ui_elements/title_default.dart';
-import '../models/product.dart';
+import '../models/recipe.dart';
 
-class ProductPage extends StatelessWidget {
-  final Product product;
+class RecipePage extends StatelessWidget {
+  final Recipe recipe;
 
-  ProductPage(this.product);
+  RecipePage(this.recipe);
 
-  Widget _buildAddressPriceRow(Product product) {
+  Widget _buildAddressPriceRow(Recipe recipe) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -21,7 +21,7 @@ class ProductPage extends StatelessWidget {
           ),
         ),
         Text(
-          '\$${product.price.toString()}',
+          '\$${recipe.price.toString()}',
           style: TextStyle(
             color: Colors.grey,
             fontFamily: 'Oswald',
@@ -40,25 +40,25 @@ class ProductPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(product.title),
+          title: Text(recipe.title),
         ),
-        // body: ProductManager(startingProduct:'Food Tester')
+        // body: RecipeManager(startingRecipe:'Food Tester')
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
               FadeInImage(
-                image: NetworkImage(product.image),
+                image: NetworkImage(recipe.image),
                 placeholder: AssetImage('assets/food.jpg'),
                 height: 300.0,
                 fit: BoxFit.cover,
               ),
-              TitleDefault(product.title),
+              TitleDefault(recipe.title),
               SizedBox(height: 10.0),
-              _buildAddressPriceRow(product),
+              _buildAddressPriceRow(recipe),
               Container(
                 margin: EdgeInsets.all(10.0),
                 child: Text(
-                  product.description,
+                  recipe.description,
                   style: TextStyle(
                     color: Colors.grey,
                   ),
