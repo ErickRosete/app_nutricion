@@ -43,7 +43,7 @@ class _AuthPageState extends State<AuthPage> {
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         String emailRegExp =
-            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+            r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$";
         if (value.isEmpty || !RegExp(emailRegExp).hasMatch(value)) {
           return "Please enter a valid E-mail";
         }
@@ -106,7 +106,9 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   void _submitForm(Function authenticate) async {
-    if (!_formKey.currentState.validate() || !_formData['acceptTerms']) return;
+    if (!_formKey.currentState.validate() ||
+        (_authMode == AuthMode.Signup && !_formData['acceptTerms'])) return;
+
     _formKey.currentState.save();
 
     Map<String, dynamic> successInformation = await authenticate(
@@ -163,7 +165,9 @@ class _AuthPageState extends State<AuthPage> {
                     _authMode == AuthMode.Signup
                         ? _buildPasswordConfirmTextField()
                         : Container(),
-                    _buildAcceptSwitch(),
+                    _authMode == AuthMode.Signup
+                        ? _buildAcceptSwitch()
+                        : Container(),
                     SizedBox(height: 10.0),
                     FlatButton(
                       child: Text(
@@ -181,9 +185,7 @@ class _AuthPageState extends State<AuthPage> {
                       builder: (BuildContext context, Widget child,
                           MainModel model) {
                         return model.isLoading
-                            ? Center(
-                                child: CircularProgressIndicator(),
-                              )
+                            ? Center(child: CircularProgressIndicator())
                             : RaisedButton(
                                 child: Text(_authMode == AuthMode.Login
                                     ? 'Login'

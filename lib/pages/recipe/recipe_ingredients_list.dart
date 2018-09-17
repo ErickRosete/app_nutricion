@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
-import 'package:scoped_model/scoped_model.dart';
-
-import './ingredient_card.dart';
 import '../../models/ingredient.dart';
-import '../../scoped-models/main.dart';
+import '../../models/recipe.dart';
+import '../../widgets/ingredients/ingredient_card.dart';
 
-class Ingredients extends StatelessWidget {
-  Widget _buildIngredientList(BuildContext context, List<Ingredient> ingredients) {
+class RecipeIngredientsListPage extends StatelessWidget {
+  final Recipe recipe;
+
+  RecipeIngredientsListPage(this.recipe);
+
+  Widget _buildIngredientList(
+      BuildContext context, List<Ingredient> ingredients) {
     var size = MediaQuery.of(context).size;
 
     double itemHeight = 0.0;
@@ -21,10 +24,9 @@ class Ingredients extends StatelessWidget {
       itemWidth = size.width / crossAxisCount;
     } else {
       crossAxisCount = 3;
-      itemHeight = (size.height - kToolbarHeight - 24) / 1.1;
+      itemHeight = (size.height - kToolbarHeight - 24);
       itemWidth = size.width / crossAxisCount;
     }
-
 
     Widget ingredientCards;
     if (ingredients.length > 0) {
@@ -47,10 +49,11 @@ class Ingredients extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<MainModel>(
-      builder: (BuildContext context, Widget child, MainModel model) {
-        return _buildIngredientList(context, model.displayedIngredients);
-      },
-    );
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(recipe.title + " - Ingredients"),
+        ),
+        // body: RecipeManager(startingRecipe:'Food Tester')
+        body: _buildIngredientList(context, recipe.ingredients));
   }
 }

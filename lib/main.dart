@@ -4,12 +4,15 @@ import 'package:scoped_model/scoped_model.dart';
 
 import './pages/recipe/recipes.dart';
 import './pages/recipe/recipe.dart';
+import './pages/recipe/recipe_ingredients_list.dart';
 import './pages/auth/auth.dart';
 import './pages/recipe/recipes_admin.dart';
 import './pages/ingredient/ingredients_admin.dart';
 import './pages/ingredient/ingredients.dart';
+import './pages/ingredient/ingredient.dart';
 import './scoped-models/main.dart';
 import './models/recipe.dart';
+import './models/ingredient.dart';
 
 void main() {
   // debugPaintSizeEnabled = true;
@@ -69,18 +72,44 @@ class _MyAppState extends State<MyApp> {
           if (pathElements[0] != '') {
             return null;
           }
+
           if (pathElements[1] == 'Recipe') {
             final String recipeId = pathElements[2];
             final Recipe recipe = _model.getRecipes.firstWhere((Recipe recipe) {
               return recipe.id == recipeId;
             });
+
+            if (pathElements.length < 4) {
+              return MaterialPageRoute<bool>(
+                builder: (BuildContext context) =>
+                    _isAuthenticated ? RecipePage(recipe) : AuthPage(),
+              );
+            }
+
+            if (pathElements[3] == "Ingredients") {
+              return MaterialPageRoute<bool>(
+                builder: (BuildContext context) => _isAuthenticated
+                    ? RecipeIngredientsListPage(recipe)
+                    : AuthPage(),
+              );
+            }
+          }
+
+          if (pathElements[1] == 'Ingredient') {
+            final String ingredientId = pathElements[2];
+            final Ingredient ingredient =
+                _model.getIngredients.firstWhere((Ingredient ingredient) {
+              return ingredient.id == ingredientId;
+            });
             return MaterialPageRoute<bool>(
               builder: (BuildContext context) =>
-                  _isAuthenticated ? RecipePage(recipe) : AuthPage(),
+                  _isAuthenticated ? IngredientPage(ingredient) : AuthPage(),
             );
           }
+
           return null;
         },
+
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(
               builder: (BuildContext context) =>

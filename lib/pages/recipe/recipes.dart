@@ -28,22 +28,24 @@ class _RecipesPageState extends State<RecipesPage> {
 
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
-      child: Column(
-        children: <Widget>[
-          AppBar(
-            automaticallyImplyLeading: false,
-            title: Text("Choose"),
-          ),
-          Image.asset('assets/placeholder_logo.png', height: 100.0),
-          Divider(),
-          IngredientsListTile(),
-          Divider(),
-          RecipesAdminListTile(),
-          Divider(),
-          IngredientsAdminListTile(),
-          Divider(),
-          LogoutListTile(),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            AppBar(
+              automaticallyImplyLeading: false,
+              title: Text("Choose"),
+            ),
+            Image.asset('assets/placeholder_logo.png', height: 100.0),
+            Divider(),
+            IngredientsListTile(),
+            Divider(),
+            RecipesAdminListTile(),
+            Divider(),
+            IngredientsAdminListTile(),
+            Divider(),
+            LogoutListTile(),
+          ],
+        ),
       ),
     );
   }
@@ -71,13 +73,13 @@ class _RecipesPageState extends State<RecipesPage> {
         actions: <Widget>[
           ScopedModelDescendant<MainModel>(
             builder: (BuildContext context, Widget child, MainModel model) {
-              IconData favoriteIcon = model.displayFavoritesOnly
+              IconData favoriteIcon = model.displayRecipesFavoritesOnly
                   ? Icons.favorite
                   : Icons.favorite_border;
               return IconButton(
                 icon: Icon(favoriteIcon),
                 onPressed: () {
-                  model.toggleDisplayMode();
+                  model.toggleRecipeDisplayMode();
                 },
               );
             },

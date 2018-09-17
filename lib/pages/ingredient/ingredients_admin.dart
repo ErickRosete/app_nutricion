@@ -15,23 +15,25 @@ class IngredientsAdminPage extends StatelessWidget {
 
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
-      child: Column(
-        children: <Widget>[
-          AppBar(
-            automaticallyImplyLeading: false,
-            title: Text("Choose"),
-          ),
-          Image.asset('assets/placeholder_logo.png', height: 100.0),
-          Divider(),
-          RecipesListTile(),
-          Divider(),
-          IngredientsListTile(),
-          Divider(),
-          RecipesAdminListTile(),
-          Divider(),
-          LogoutListTile(),
-          Divider(),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            AppBar(
+              automaticallyImplyLeading: false,
+              title: Text("Choose"),
+            ),
+            Image.asset('assets/placeholder_logo.png', height: 100.0),
+            Divider(),
+            RecipesListTile(),
+            Divider(),
+            IngredientsListTile(),
+            Divider(),
+            RecipesAdminListTile(),
+            Divider(),
+            LogoutListTile(),
+            Divider(),
+          ],
+        ),
       ),
     );
   }

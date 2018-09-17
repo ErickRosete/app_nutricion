@@ -61,6 +61,13 @@ class RecipePage extends StatelessWidget {
                   textAlign: TextAlign.justify,
                 ),
               ),
+              RaisedButton(
+                onPressed: () {
+                Navigator.pushNamed<bool>(
+                    context, "/Recipe/" + recipe.id + "/Ingredients");
+              },
+                child: Text("View Ingredients"),
+              ),
             ],
           ),
         ),

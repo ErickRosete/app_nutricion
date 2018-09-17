@@ -10,15 +10,27 @@ class Recipes extends StatelessWidget {
   Widget _buildRecipeList(BuildContext context, List<Recipe> recipes) {
     var size = MediaQuery.of(context).size;
 
-    /*24 is for notification bar on Android*/
-    final double itemHeight = (size.height - kToolbarHeight - 24) / 1.80;
-    final double itemWidth = size.width / 2;
+    double itemHeight = 0.0;
+    double itemWidth = 0.0;
+    int crossAxisCount = 0;
+
+    if (size.width < 500) {
+      crossAxisCount = 2;
+      /*24 is for notification bar on Android*/
+      itemHeight = (size.height - kToolbarHeight - 24) / 1.75;
+      itemWidth = size.width / crossAxisCount;
+    } else {
+      crossAxisCount = 3;
+      itemHeight = (size.height - kToolbarHeight - 24);
+      itemWidth = size.width / crossAxisCount / 1.05;
+    }
+
 
     Widget recipeCards;
     if (recipes.length > 0) {
       recipeCards = GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+          crossAxisCount: crossAxisCount,
           childAspectRatio: (itemWidth / itemHeight),
         ),
         itemBuilder: (BuildContext context, int index) =>

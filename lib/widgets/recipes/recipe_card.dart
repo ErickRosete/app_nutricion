@@ -42,13 +42,14 @@ class RecipeCard extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: Icon(model.getRecipes[recipeIndex].isFavorite
+              icon: Icon(model.getRecipes[recipeIndex].isFavorite || model.displayRecipesFavoritesOnly
                   ? Icons.favorite
                   : Icons.favorite_border),
               color: Colors.red,
               onPressed: () {
                 model.setSelectedRecipe(model.getRecipes[recipeIndex].id);
                 model.toggleRecipeFavoriteStatus();
+                model.setSelectedRecipe(null);
               },
             ),
           ],

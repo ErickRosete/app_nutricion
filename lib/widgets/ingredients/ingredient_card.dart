@@ -39,13 +39,14 @@ class IngredientCard extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: Icon(model.getIngredients[ingredientIndex].isFavorite
+              icon: Icon(model.getIngredients[ingredientIndex].isFavorite || model.displayIngredientsFavoritesOnly
                   ? Icons.favorite
                   : Icons.favorite_border),
               color: Colors.red,
               onPressed: () {
                 model.setSelectedIngredient(model.getIngredients[ingredientIndex].id);
                 model.toggleIngredientFavoriteStatus();
+                model.setSelectedIngredient(null);
               },
             ),
           ],

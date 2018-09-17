@@ -28,22 +28,24 @@ class _IngredientsPageState extends State<IngredientsPage> {
 
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
-      child: Column(
-        children: <Widget>[
-          AppBar(
-            automaticallyImplyLeading: false,
-            title: Text("Choose"),
-          ),
-          Image.asset('assets/placeholder_logo.png', height: 100.0),
-          Divider(),
-          RecipesListTile(),
-          Divider(),
-          RecipesAdminListTile(),
-          Divider(),
-          IngredientsAdminListTile(),
-          Divider(),
-          LogoutListTile(),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            AppBar(
+              automaticallyImplyLeading: false,
+              title: Text("Choose"),
+            ),
+            Image.asset('assets/placeholder_logo.png', height: 100.0),
+            Divider(),
+            RecipesListTile(),
+            Divider(),
+            RecipesAdminListTile(),
+            Divider(),
+            IngredientsAdminListTile(),
+            Divider(),
+            LogoutListTile(),
+          ],
+        ),
       ),
     );
   }
@@ -57,7 +59,8 @@ class _IngredientsPageState extends State<IngredientsPage> {
         } else if (model.isLoading) {
           content = Center(child: CircularProgressIndicator());
         }
-        return RefreshIndicator(onRefresh: model.fetchIngredients, child: content);
+        return RefreshIndicator(
+            onRefresh: model.fetchIngredients, child: content);
       },
     );
   }
@@ -71,13 +74,13 @@ class _IngredientsPageState extends State<IngredientsPage> {
         actions: <Widget>[
           ScopedModelDescendant<MainModel>(
             builder: (BuildContext context, Widget child, MainModel model) {
-              IconData favoriteIcon = model.displayFavoritesOnly
+              IconData favoriteIcon = model.displayIngredientsFavoritesOnly
                   ? Icons.favorite
                   : Icons.favorite_border;
               return IconButton(
                 icon: Icon(favoriteIcon),
                 onPressed: () {
-                  model.toggleDisplayMode();
+                  model.toggleIngredientDisplayMode();
                 },
               );
             },

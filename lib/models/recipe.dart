@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-//import './Ingredients.dart';
+import './ingredient.dart';
 
 class Recipe {
   final String id;
@@ -11,7 +11,7 @@ class Recipe {
   final bool isFavorite;
   final String userEmail;
   final String userId;
-  //final List<Ingredient> ingredients;
+  final List<Ingredient> ingredients;
 
   Recipe(
       {@required this.id,
@@ -22,6 +22,6 @@ class Recipe {
       this.isFavorite = false,
       @required this.userEmail,
       @required this.userId,
-      //@required this.ingredients
+      @required this.ingredients
       });
 }

@@ -14,6 +14,7 @@ import '../models/auth.dart';
 ////////////////////////////////////////CONNECTED RECIPES MODEL////////////////////////////////////////////
 class ConnectedRecipesModel extends Model {
   List<Recipe> _recipes = [];
+  List<Ingredient> _ingredients = [];
   String _selectedRecipeId;
   User _authenticatedUser;
   bool _isLoading = false;
@@ -51,8 +52,18 @@ class ConnectedRecipesModel extends Model {
           image: image,
           price: price,
           userEmail: _authenticatedUser.email,
-          userId: _authenticatedUser.id);
+          userId: _authenticatedUser.id,
+          ingredients: new List<Ingredient>());
+
+      //Make sure ingredients have been fetched
+      await fetchIngredients();
+      //Adding manually first ingredient
+      if (_ingredients != null && _ingredients.length > 0) {
+        addIngredientToRecipe(newRecipe, _ingredients[0]);
+      }
+
       _recipes.add(newRecipe);
+
       _isLoading = false;
       notifyListeners();
       return true;
@@ -62,19 +73,79 @@ class ConnectedRecipesModel extends Model {
       return false;
     }
   }
+
+  Future<bool> addIngredientToRecipe(
+      Recipe recipe, Ingredient ingredient) async {
+    // _isLoading = true;
+    // notifyListeners();
+    http.Response response;
+    response = await http.put(
+        'https://app-de-nutricion.firebaseio.com/recipes/${recipe.id}/ingredients/${ingredient.id}.json?auth=${_authenticatedUser.token}',
+        body: json.encode(true));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      recipe.ingredients.add(ingredient);
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<bool> fetchIngredients({bool onlyForUser = false}) {
+    _isLoading = true;
+    notifyListeners();
+
+    return http
+        .get(
+            'https://app-de-nutricion.firebaseio.com/ingredients.json?auth=${_authenticatedUser.token}')
+        .then((http.Response response) {
+      final List<Ingredient> fetchedIngredientList = [];
+      final Map<String, dynamic> ingredientListData =
+          json.decode(response.body);
+      if (ingredientListData != null) {
+        ingredientListData
+            .forEach((String ingredientId, dynamic ingredientData) {
+          final Ingredient ingredient = Ingredient(
+              id: ingredientId,
+              title: ingredientData['title'],
+              description: ingredientData['description'],
+              image: ingredientData['image'],
+              userEmail: ingredientData['userEmail'],
+              userId: ingredientData['userId'],
+              isFavorite: ingredientData['wishlistUsers'] != null
+                  ? (ingredientData['wishlistUsers'] as Map<String, dynamic>)
+                      .containsKey(_authenticatedUser.id)
+                  : false);
+          fetchedIngredientList.add(ingredient);
+        });
+        _ingredients = onlyForUser
+            ? fetchedIngredientList.where((Ingredient ingredient) {
+                return ingredient.userId == _authenticatedUser.id;
+              }).toList()
+            : fetchedIngredientList;
+      }
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
+  }
 }
 
 //////////////////////////////////////// RECIPES MODEL////////////////////////////////////////////
 
 class RecipesModel extends ConnectedRecipesModel {
-  bool _showFavorites = false;
+  bool _showRecipesFavorites = false;
 
   List<Recipe> get getRecipes {
     return List.from(_recipes);
   }
 
   List<Recipe> get displayedRecipes {
-    if (_showFavorites)
+    if (_showRecipesFavorites)
       return _recipes.where((Recipe recipe) => recipe.isFavorite).toList();
     return List.from(_recipes);
   }
@@ -89,8 +160,8 @@ class RecipesModel extends ConnectedRecipesModel {
     });
   }
 
-  bool get displayFavoritesOnly {
-    return _showFavorites;
+  bool get displayRecipesFavoritesOnly {
+    return _showRecipesFavorites;
   }
 
   Recipe get selectedRecipe {
@@ -127,7 +198,8 @@ class RecipesModel extends ConnectedRecipesModel {
           image: image,
           price: price,
           userEmail: selectedRecipe.userEmail,
-          userId: selectedRecipe.userId);
+          userId: selectedRecipe.userId,
+          ingredients: selectedRecipe.ingredients);
       _recipes[getSelectedRecipeIndex] = updatedRecipe;
       _isLoading = false;
       notifyListeners();
@@ -166,9 +238,29 @@ class RecipesModel extends ConnectedRecipesModel {
     }
   }
 
-  Future<bool> fetchRecipes({bool onlyForUser = false}) {
+  List<Ingredient> fetchIngredientsByIds(Map<String, dynamic> ingredientsMap) {
+    
+    List<Ingredient> ingredients = new List<Ingredient>();
+
+    ingredientsMap.forEach(
+      (String ingredientId, dynamic boleano) {
+        ingredients.add(_ingredients.firstWhere(
+          (Ingredient ingredient) {
+            return ingredient.id == ingredientId;
+          },
+        ));
+      },
+    );
+
+    return ingredients;
+  }
+
+  Future<bool> fetchRecipes({bool onlyForUser = false}) async {
     _isLoading = true;
     notifyListeners();
+
+    //Make sure _ingredients have been fetched
+    await fetchIngredients();
 
     return http
         .get(
@@ -189,7 +281,17 @@ class RecipesModel extends ConnectedRecipesModel {
               isFavorite: recipeData['wishlistUsers'] != null
                   ? (recipeData['wishlistUsers'] as Map<String, dynamic>)
                       .containsKey(_authenticatedUser.id)
-                  : false);
+                  : false,
+              ingredients: recipeData['ingredients'] != null
+                  ? fetchIngredientsByIds(
+                      recipeData['ingredients'] as Map<String, dynamic>)
+                  : new List<Ingredient>());
+
+          // //Adding manually first ingredient
+          // if (recipe.ingredients.length == 0) {
+          //   addIngredientToRecipe(recipe, _ingredients[0]);
+          // }
+
           fetchedRecipeList.add(recipe);
         });
         _recipes = onlyForUser
@@ -220,7 +322,8 @@ class RecipesModel extends ConnectedRecipesModel {
         title: selectedRecipe.title,
         userEmail: selectedRecipe.userEmail,
         userId: selectedRecipe.userId,
-        isFavorite: newFavoriteStatus);
+        isFavorite: newFavoriteStatus,
+        ingredients: selectedRecipe.ingredients);
 
     // _isLoading = true;
     // notifyListeners();
@@ -245,7 +348,8 @@ class RecipesModel extends ConnectedRecipesModel {
           title: selectedRecipe.title,
           userEmail: selectedRecipe.userEmail,
           userId: selectedRecipe.userId,
-          isFavorite: !newFavoriteStatus);
+          isFavorite: !newFavoriteStatus,
+          ingredients: selectedRecipe.ingredients);
       return false;
     }
 
@@ -254,8 +358,8 @@ class RecipesModel extends ConnectedRecipesModel {
     return true;
   }
 
-  void toggleDisplayMode() {
-    _showFavorites = !_showFavorites;
+  void toggleRecipeDisplayMode() {
+    _showRecipesFavorites = !_showRecipesFavorites;
     notifyListeners();
   }
 }
@@ -263,7 +367,6 @@ class RecipesModel extends ConnectedRecipesModel {
 ////////////////////////////////////////CONNECTED INGREDIENTS MODEL////////////////////////////////////////////
 
 class ConnectedIngredientsModel extends ConnectedRecipesModel {
-  List<Ingredient> _ingredients = [];
   String _selectedIngredientId;
 
   Future<bool> addIngredient(
@@ -274,13 +377,14 @@ class ConnectedIngredientsModel extends ConnectedRecipesModel {
     final Map<String, dynamic> ingredientData = {
       'title': title,
       'description': description,
-      'image': 'https://media.phillyvoice.com/media/images/food-eggs.2e16d0ba.fill-735x490.jpg',
+      'image':
+          'https://media.phillyvoice.com/media/images/food-eggs.2e16d0ba.fill-735x490.jpg',
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id
     };
     try {
       final http.Response response = await http.post(
-          'https://app-de-nutricion.firebaseio.com/Ingredients.json?auth=${_authenticatedUser.token}',
+          'https://app-de-nutricion.firebaseio.com/ingredients.json?auth=${_authenticatedUser.token}',
           body: json.encode(ingredientData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -320,8 +424,14 @@ class IngredientsModel extends ConnectedIngredientsModel {
 
   List<Ingredient> get displayedIngredients {
     if (_showIngredientsFavorites)
-      return _ingredients.where((Ingredient ingredient) => ingredient.isFavorite).toList();
+      return _ingredients
+          .where((Ingredient ingredient) => ingredient.isFavorite)
+          .toList();
     return List.from(_ingredients);
+  }
+
+  bool get displayIngredientsFavoritesOnly {
+    return _showIngredientsFavorites;
   }
 
   String get getSelectedIngredientId {
@@ -349,7 +459,8 @@ class IngredientsModel extends ConnectedIngredientsModel {
     final Map<String, dynamic> updateData = {
       'title': title,
       'description': description,
-      'image':'https://media.phillyvoice.com/media/images/food-eggs.2e16d0ba.fill-735x490.jpg',
+      'image':
+          'https://media.phillyvoice.com/media/images/food-eggs.2e16d0ba.fill-735x490.jpg',
       'userEmail': selectedIngredient.userEmail,
       'userId': selectedIngredient.userId
     };
@@ -404,47 +515,6 @@ class IngredientsModel extends ConnectedIngredientsModel {
     }
   }
 
-  Future<bool> fetchIngredients({bool onlyForUser = false}) {
-    _isLoading = true;
-    notifyListeners();
-
-    return http
-        .get(
-            'https://app-de-nutricion.firebaseio.com/ingredients.json?auth=${_authenticatedUser.token}')
-        .then((http.Response response) {
-      final List<Ingredient> fetchedIngredientList = [];
-      final Map<String, dynamic> ingredientListData = json.decode(response.body);
-      if (ingredientListData != null) {
-        ingredientListData.forEach((String ingredientId, dynamic ingredientData) {
-          final Ingredient ingredient = Ingredient(
-              id: ingredientId,
-              title: ingredientData['title'],
-              description: ingredientData['description'],
-              image: ingredientData['image'],
-              userEmail: ingredientData['userEmail'],
-              userId: ingredientData['userId'],
-              isFavorite: ingredientData['wishlistUsers'] != null
-                  ? (ingredientData['wishlistUsers'] as Map<String, dynamic>)
-                      .containsKey(_authenticatedUser.id)
-                  : false);
-          fetchedIngredientList.add(ingredient);
-        });
-        _ingredients = onlyForUser
-            ? fetchedIngredientList.where((Ingredient ingredient) {
-                return ingredient.userId == _authenticatedUser.id;
-              }).toList()
-            : fetchedIngredientList;
-      }
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    }).catchError((error) {
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    });
-  }
-
   Future<bool> toggleIngredientFavoriteStatus() async {
     final bool isCurrentlyFavorite = selectedIngredient.isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
@@ -487,6 +557,11 @@ class IngredientsModel extends ConnectedIngredientsModel {
     // _isLoading = false;
     notifyListeners();
     return true;
+  }
+
+  void toggleIngredientDisplayMode() {
+    _showIngredientsFavorites = !_showIngredientsFavorites;
+    notifyListeners();
   }
 }
 
