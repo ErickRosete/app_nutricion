@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import '../widgets/ui_elements/title_default.dart';
-import '../models/recipe.dart';
+import '../../widgets/ui_elements/title_default.dart';
+import '../../widgets/ui_elements/image_with_placeholder.dart';
+import '../../models/recipe.dart';
 
 class RecipePage extends StatelessWidget {
   final Recipe recipe;
@@ -46,12 +47,7 @@ class RecipePage extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              FadeInImage(
-                image: NetworkImage(recipe.image),
-                placeholder: AssetImage('assets/food.jpg'),
-                height: 300.0,
-                fit: BoxFit.cover,
-              ),
+              ImageWithPlaceholder(recipe.image, 200.0),
               TitleDefault(recipe.title),
               SizedBox(height: 10.0),
               _buildAddressPriceRow(recipe),

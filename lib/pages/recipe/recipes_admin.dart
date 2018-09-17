@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../scoped-models/main.dart';
+import '../../scoped-models/main.dart';
 import './recipe_form.dart';
 import './recipe_list.dart';
-import '../widgets/ui_elements/logout_list_tile.dart';
+import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
+import '../../widgets/ui_elements/drawer/recipes_list_tile.dart';
+import '../../widgets/ui_elements/drawer/ingredients_list_tile.dart';
+import '../../widgets/ui_elements/drawer/ingredients_admin_list_tile.dart';
 
-class RecipeAdminPage extends StatelessWidget {
+class RecipesAdminPage extends StatelessWidget {
   final MainModel model;
 
-  RecipeAdminPage(this.model);
+  RecipesAdminPage(this.model);
 
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
@@ -18,15 +21,16 @@ class RecipeAdminPage extends StatelessWidget {
             automaticallyImplyLeading: false,
             title: Text("Choose"),
           ),
-          ListTile(
-            leading: Icon(Icons.shop),
-            title: Text("Recipes list"),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/');
-            },
-          ),
+          Image.asset('assets/placeholder_logo.png', height: 100.0),
+          Divider(),
+          RecipesListTile(),
+          Divider(),
+          IngredientsListTile(),
+          Divider(),
+          IngredientsAdminListTile(),
           Divider(),
           LogoutListTile(),
+          Divider(),
         ],
       ),
     );

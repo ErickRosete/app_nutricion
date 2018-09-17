@@ -1,28 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import './price_tag.dart';
-import './address_tag.dart';
 import '../ui_elements/title_default.dart';
 import '../ui_elements/image_with_placeholder.dart';
-import '../../models/recipe.dart';
+import '../../models/ingredient.dart';
 import '../../scoped-models/main.dart';
 
-class RecipeCard extends StatelessWidget {
-  final Recipe recipe;
-  final int recipeIndex;
+class IngredientCard extends StatelessWidget {
+  final Ingredient ingredient;
+  final int ingredientIndex;
 
-  RecipeCard(this.recipe, this.recipeIndex);
+  IngredientCard(this.ingredient, this.ingredientIndex);
 
   Widget _buildTitlePriceRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        TitleDefault(recipe.title),
+        TitleDefault(ingredient.title),
         SizedBox(
           width: 8.0,
         ),
-        PriceTag(recipe.price.toString()),
       ],
     );
   }
@@ -38,17 +35,17 @@ class RecipeCard extends StatelessWidget {
               color: Colors.blue,
               onPressed: () {
                 Navigator.pushNamed<bool>(
-                    context, "/Recipe/" + model.getRecipes[recipeIndex].id);
+                    context, "/Ingredient/" + model.getIngredients[ingredientIndex].id);
               },
             ),
             IconButton(
-              icon: Icon(model.getRecipes[recipeIndex].isFavorite
+              icon: Icon(model.getIngredients[ingredientIndex].isFavorite
                   ? Icons.favorite
                   : Icons.favorite_border),
               color: Colors.red,
               onPressed: () {
-                model.setSelectedRecipe(model.getRecipes[recipeIndex].id);
-                model.toggleRecipeFavoriteStatus();
+                model.setSelectedIngredient(model.getIngredients[ingredientIndex].id);
+                model.toggleIngredientFavoriteStatus();
               },
             ),
           ],
@@ -64,13 +61,12 @@ class RecipeCard extends StatelessWidget {
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            ImageWithPlaceholder(recipe.image),
+            ImageWithPlaceholder(ingredient.image),
             SizedBox(height: 10.0),
             Container(
               margin: EdgeInsets.only(top: 10.0),
               child: _buildTitlePriceRow(),
             ),
-            AddressTag('Union Square, San Francisco'),
             _buildActionButtons(context),
           ],
         ),

@@ -1,33 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import '../models/recipe.dart';
-import '../scoped-models/main.dart';
+import '../../models/ingredient.dart';
+import '../../scoped-models/main.dart';
 
-class RecipeFormPage extends StatefulWidget {
-  final int recipeIndex;
+class IngredientFormPage extends StatefulWidget {
+  final int ingredientIndex;
 
-  RecipeFormPage({this.recipeIndex});
+  IngredientFormPage({this.ingredientIndex});
 
   @override
   State<StatefulWidget> createState() {
-    return _RecipeFormPageState();
+    return _IngredientFormPageState();
   }
 }
 
-class _RecipeFormPageState extends State<RecipeFormPage> {
+class _IngredientFormPageState extends State<IngredientFormPage> {
   final Map<String, dynamic> _formData = {
     'title': null,
     'description': null,
-    'price': null,
     'image': 'assets/food.jpg',
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  Widget _buildTitleTextField(Recipe recipe) {
+  Widget _buildTitleTextField(Ingredient ingredient) {
     return TextFormField(
-      initialValue: recipe == null ? '' : recipe.title,
-      decoration: InputDecoration(labelText: 'Recipe Title'),
+      initialValue: ingredient == null ? '' : ingredient.title,
+      decoration: InputDecoration(labelText: 'Ingredient Title'),
       validator: (String value) {
         if (value.isEmpty || value.length < 5) {
           return 'Title is required and should be 5+ characters long.';
@@ -40,11 +39,11 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
     );
   }
 
-  Widget _buildDescriptionTextField(Recipe recipe) {
+  Widget _buildDescriptionTextField(Ingredient ingredient) {
     return TextFormField(
       maxLines: 4,
-      initialValue: recipe == null ? '' : recipe.description,
-      decoration: InputDecoration(labelText: 'Recipe Description'),
+      initialValue: ingredient == null ? '' : ingredient.description,
+      decoration: InputDecoration(labelText: 'Ingredient Description'),
       validator: (String value) {
         if (value.isEmpty || value.length < 10) {
           return 'Description is required and should be 10+ characters long.';
@@ -57,38 +56,20 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
     );
   }
 
-  Widget _buildPriceTextField(Recipe recipe) {
-    return TextFormField(
-      initialValue: recipe == null ? '' : recipe.price.toString(),
-      decoration: InputDecoration(labelText: 'Recipe Price'),
-      validator: (String value) {
-        if (value.isEmpty ||
-            !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
-          return 'Price is required and should be a number.';
-        }
-        return null;
-      },
-      keyboardType: TextInputType.number,
-      onSaved: (String value) {
-        _formData['price'] = double.parse(value);
-      },
-    );
-  }
-
   Widget _buildSubmitButton(MainModel model) {
     return model.isLoading
         ? Center(child: CircularProgressIndicator())
         : RaisedButton(
             child: Text("Save"),
             textColor: Colors.white,
-            onPressed: () => _submitForm(model.addRecipe, model.updateRecipe,
-                model.setSelectedRecipe, model.getSelectedRecipeIndex));
+            onPressed: () => _submitForm(model.addIngredient, model.updateIngredient,
+                model.setSelectedIngredient, model.getSelectedIngredientIndex));
   }
 
-  void _errorManagement(bool success, Function setSelectedRecipe) {
+  void _errorManagement(bool success, Function setSelectedIngredient) {
     if (success) {
-      Navigator.pushReplacementNamed(context, '/')
-          .then((_) => setSelectedRecipe(null));
+      Navigator.pushReplacementNamed(context, '/ingredients')
+          .then((_) => setSelectedIngredient(null));
     } else {
       showDialog(
           context: context,
@@ -108,27 +89,25 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
   }
 
   void _submitForm(
-      Function addRecipe, Function updateRecipe, Function setSelectedRecipe,
-      [int selectedRecipeIndex]) {
+      Function addIngredient, Function updateIngredient, Function setSelectedIngredient,
+      [int selectedIngredientIndex]) {
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
-    if (selectedRecipeIndex == -1) {
-      addRecipe(
+    if (selectedIngredientIndex == -1) {
+      addIngredient(
         _formData['title'],
         _formData['description'],
         _formData['image'],
-        _formData['price'],
       ).then((bool success) {
-        _errorManagement(success, setSelectedRecipe);
+        _errorManagement(success, setSelectedIngredient);
       });
     } else {
-      updateRecipe(
+      updateIngredient(
         _formData['title'],
         _formData['description'],
         _formData['image'],
-        _formData['price'],
       ).then((bool success) {
-        _errorManagement(success, setSelectedRecipe);
+        _errorManagement(success, setSelectedIngredient);
       });
     }
   }
@@ -137,7 +116,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
     final double targetPadding = deviceWidth - targetWidth;
-    final Recipe recipe = model.selectedRecipe;
+    final Ingredient ingredient = model.selectedIngredient;
 
     return GestureDetector(
       onTap: () {
@@ -150,9 +129,8 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
           child: ListView(
             padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
             children: <Widget>[
-              _buildTitleTextField(recipe),
-              _buildDescriptionTextField(recipe),
-              _buildPriceTextField(recipe),
+              _buildTitleTextField(ingredient),
+              _buildDescriptionTextField(ingredient),
               SizedBox(
                 height: 10.0,
               ),
@@ -169,10 +147,10 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         Widget pageContent = _buildPageContent(context, model);
-        if (model.getSelectedRecipeIndex == -1) return pageContent;
+        if (model.getSelectedIngredientIndex == -1) return pageContent;
         return Scaffold(
           appBar: AppBar(
-            title: Text("Edit Recipe"),
+            title: Text("Edit Ingredient"),
           ),
           body: pageContent,
         );
@@ -193,7 +171,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
 ///////////////////////////////Modal/////////////////////////////////////
 //  Center(
 //   child: RaisedButton(
-//     child: Text("Create a Recipe"),
+//     child: Text("Create a Ingredient"),
 //     onPressed: () {
 //       showModalBottomSheet(
 //           context: context,

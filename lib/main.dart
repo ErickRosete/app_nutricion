@@ -2,21 +2,15 @@ import 'package:flutter/material.dart';
 //import 'package:flutter/rendering.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import './pages/recipes.dart';
-import './pages/recipe.dart';
-import './pages/auth.dart';
-import './pages/recipes_admin.dart';
+import './pages/recipe/recipes.dart';
+import './pages/recipe/recipe.dart';
+import './pages/auth/auth.dart';
+import './pages/recipe/recipes_admin.dart';
+import './pages/ingredient/ingredients_admin.dart';
+import './pages/ingredient/ingredients.dart';
 import './scoped-models/main.dart';
 import './models/recipe.dart';
 
-// void main() => runApp(MyApp());
-
-// Not typed variables
-// main() {
-//   runApp(MyApp());
-// }
-
-// Typed variables
 void main() {
   // debugPaintSizeEnabled = true;
   // debugPaintPointersEnabled = true;
@@ -50,21 +44,20 @@ class _MyAppState extends State<MyApp> {
     return ScopedModel<MainModel>(
       model: _model,
       child: MaterialApp(
-//      debugShowMaterialGrid: true,
         theme: ThemeData(
           primarySwatch: Colors.green,
           buttonColor: Colors.greenAccent,
-//        fontFamily: 'Oswald',
-//        brightness: Brightness.light,
-//        accentColor: Colors.deepPurple,
-//        buttonColor: Colors.purple[200]
         ),
 //        home: AuthPage(),
         routes: {
-          '/admin': (BuildContext context) =>
-              _isAuthenticated ? RecipeAdminPage(_model) : AuthPage(),
           '/': (BuildContext context) =>
               _isAuthenticated ? RecipesPage(_model) : AuthPage(),
+          '/ingredients': (BuildContext context) =>
+              _isAuthenticated ? IngredientsPage(_model) : AuthPage(),
+          '/recipesAdmin': (BuildContext context) =>
+              _isAuthenticated ? RecipesAdminPage(_model) : AuthPage(),
+          '/ingredientsAdmin': (BuildContext context) =>
+              _isAuthenticated ? IngredientsAdminPage(_model) : AuthPage(),
         },
         onGenerateRoute: (RouteSettings settings) {
           if (!_isAuthenticated) {
@@ -78,8 +71,7 @@ class _MyAppState extends State<MyApp> {
           }
           if (pathElements[1] == 'Recipe') {
             final String recipeId = pathElements[2];
-            final Recipe recipe =
-                _model.getRecipes.firstWhere((Recipe recipe) {
+            final Recipe recipe = _model.getRecipes.firstWhere((Recipe recipe) {
               return recipe.id == recipeId;
             });
             return MaterialPageRoute<bool>(

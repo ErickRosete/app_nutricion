@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import '../widgets/recipes/recipes.dart';
-import '../widgets/ui_elements/logout_list_tile.dart';
-import '../scoped-models/main.dart';
+import '../../widgets/recipes/recipes.dart';
+import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
+import '../../widgets/ui_elements/drawer/ingredients_list_tile.dart';
+import '../../widgets/ui_elements/drawer/ingredients_admin_list_tile.dart';
+import '../../widgets/ui_elements/drawer/recipes_admin_list_tile.dart';
+import '../../scoped-models/main.dart';
 
 class RecipesPage extends StatefulWidget {
   final MainModel model;
@@ -31,13 +34,13 @@ class _RecipesPageState extends State<RecipesPage> {
             automaticallyImplyLeading: false,
             title: Text("Choose"),
           ),
-          ListTile(
-            leading: Icon(Icons.edit),
-            title: Text("Manage Recipes"),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/admin');
-            },
-          ),
+          Image.asset('assets/placeholder_logo.png', height: 100.0),
+          Divider(),
+          IngredientsListTile(),
+          Divider(),
+          RecipesAdminListTile(),
+          Divider(),
+          IngredientsAdminListTile(),
           Divider(),
           LogoutListTile(),
         ],

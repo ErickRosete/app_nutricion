@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import './recipe_form.dart';
-import '../models/recipe.dart';
-import '../scoped-models/main.dart';
+import '../../models/recipe.dart';
+import '../../scoped-models/main.dart';
 
 class RecipeListPage extends StatefulWidget {
   final MainModel model;

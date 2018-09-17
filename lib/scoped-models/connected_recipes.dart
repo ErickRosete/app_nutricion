@@ -6,10 +6,12 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/subjects.dart';
 
+import '../models/ingredient.dart';
 import '../models/recipe.dart';
 import '../models/user.dart';
 import '../models/auth.dart';
 
+////////////////////////////////////////CONNECTED RECIPES MODEL////////////////////////////////////////////
 class ConnectedRecipesModel extends Model {
   List<Recipe> _recipes = [];
   String _selectedRecipeId;
@@ -61,6 +63,8 @@ class ConnectedRecipesModel extends Model {
     }
   }
 }
+
+//////////////////////////////////////// RECIPES MODEL////////////////////////////////////////////
 
 class RecipesModel extends ConnectedRecipesModel {
   bool _showFavorites = false;
@@ -255,6 +259,238 @@ class RecipesModel extends ConnectedRecipesModel {
     notifyListeners();
   }
 }
+
+////////////////////////////////////////CONNECTED INGREDIENTS MODEL////////////////////////////////////////////
+
+class ConnectedIngredientsModel extends ConnectedRecipesModel {
+  List<Ingredient> _ingredients = [];
+  String _selectedIngredientId;
+
+  Future<bool> addIngredient(
+      String title, String description, String image) async {
+    _isLoading = true;
+    notifyListeners();
+
+    final Map<String, dynamic> ingredientData = {
+      'title': title,
+      'description': description,
+      'image': 'https://media.phillyvoice.com/media/images/food-eggs.2e16d0ba.fill-735x490.jpg',
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id
+    };
+    try {
+      final http.Response response = await http.post(
+          'https://app-de-nutricion.firebaseio.com/Ingredients.json?auth=${_authenticatedUser.token}',
+          body: json.encode(ingredientData));
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      Ingredient newIngredient = Ingredient(
+          id: responseData['name'],
+          title: title,
+          description: description,
+          image: image,
+          userEmail: _authenticatedUser.email,
+          userId: _authenticatedUser.id);
+      _ingredients.add(newIngredient);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+}
+
+////////////////////////////////////////INGREDIENTS MODEL////////////////////////////////////////////
+
+class IngredientsModel extends ConnectedIngredientsModel {
+  bool _showIngredientsFavorites = false;
+
+  List<Ingredient> get getIngredients {
+    return List.from(_ingredients);
+  }
+
+  List<Ingredient> get displayedIngredients {
+    if (_showIngredientsFavorites)
+      return _ingredients.where((Ingredient ingredient) => ingredient.isFavorite).toList();
+    return List.from(_ingredients);
+  }
+
+  String get getSelectedIngredientId {
+    return _selectedIngredientId;
+  }
+
+  int get getSelectedIngredientIndex {
+    return _ingredients.indexWhere((Ingredient ingredient) {
+      return ingredient.id == _selectedIngredientId;
+    });
+  }
+
+  Ingredient get selectedIngredient {
+    if (_selectedIngredientId == null) return null;
+    return _ingredients.firstWhere((Ingredient ingredient) {
+      return ingredient.id == _selectedIngredientId;
+    });
+  }
+
+  Future<bool> updateIngredient(
+      String title, String description, String image) {
+    _isLoading = true;
+    notifyListeners();
+
+    final Map<String, dynamic> updateData = {
+      'title': title,
+      'description': description,
+      'image':'https://media.phillyvoice.com/media/images/food-eggs.2e16d0ba.fill-735x490.jpg',
+      'userEmail': selectedIngredient.userEmail,
+      'userId': selectedIngredient.userId
+    };
+
+    return http
+        .put(
+            'https://app-de-nutricion.firebaseio.com/ingredients/${selectedIngredient.id}.json?auth=${_authenticatedUser.token}',
+            body: json.encode(updateData))
+        .then((http.Response response) {
+      Ingredient updatedIngredient = Ingredient(
+          id: selectedIngredient.id,
+          title: title,
+          description: description,
+          image: image,
+          userEmail: selectedIngredient.userEmail,
+          userId: selectedIngredient.userId);
+      _ingredients[getSelectedIngredientIndex] = updatedIngredient;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
+  }
+
+  Future<bool> deleteIngredient() {
+    _isLoading = true;
+    final String deletedIngredientId = selectedIngredient.id;
+    _ingredients.removeAt(getSelectedIngredientIndex);
+    _selectedIngredientId = null;
+    notifyListeners();
+    return http
+        .delete(
+            'https://app-de-nutricion.firebaseio.com/ingredients/$deletedIngredientId.json?auth=${_authenticatedUser.token}')
+        .then((http.Response response) {
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
+  }
+
+  void setSelectedIngredient(String ingredientId) {
+    _selectedIngredientId = ingredientId;
+    if (ingredientId != null) {
+      notifyListeners();
+    }
+  }
+
+  Future<bool> fetchIngredients({bool onlyForUser = false}) {
+    _isLoading = true;
+    notifyListeners();
+
+    return http
+        .get(
+            'https://app-de-nutricion.firebaseio.com/ingredients.json?auth=${_authenticatedUser.token}')
+        .then((http.Response response) {
+      final List<Ingredient> fetchedIngredientList = [];
+      final Map<String, dynamic> ingredientListData = json.decode(response.body);
+      if (ingredientListData != null) {
+        ingredientListData.forEach((String ingredientId, dynamic ingredientData) {
+          final Ingredient ingredient = Ingredient(
+              id: ingredientId,
+              title: ingredientData['title'],
+              description: ingredientData['description'],
+              image: ingredientData['image'],
+              userEmail: ingredientData['userEmail'],
+              userId: ingredientData['userId'],
+              isFavorite: ingredientData['wishlistUsers'] != null
+                  ? (ingredientData['wishlistUsers'] as Map<String, dynamic>)
+                      .containsKey(_authenticatedUser.id)
+                  : false);
+          fetchedIngredientList.add(ingredient);
+        });
+        _ingredients = onlyForUser
+            ? fetchedIngredientList.where((Ingredient ingredient) {
+                return ingredient.userId == _authenticatedUser.id;
+              }).toList()
+            : fetchedIngredientList;
+      }
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
+  }
+
+  Future<bool> toggleIngredientFavoriteStatus() async {
+    final bool isCurrentlyFavorite = selectedIngredient.isFavorite;
+    final bool newFavoriteStatus = !isCurrentlyFavorite;
+
+    _ingredients[getSelectedIngredientIndex] = Ingredient(
+        id: selectedIngredient.id,
+        description: selectedIngredient.description,
+        image: selectedIngredient.image,
+        title: selectedIngredient.title,
+        userEmail: selectedIngredient.userEmail,
+        userId: selectedIngredient.userId,
+        isFavorite: newFavoriteStatus);
+
+    // _isLoading = true;
+    // notifyListeners();
+    http.Response response;
+    if (newFavoriteStatus) {
+      response = await http.put(
+          'https://app-de-nutricion.firebaseio.com/ingredients/${selectedIngredient.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+          body: json.encode(true));
+    } else {
+      response = await http.delete(
+          'https://app-de-nutricion.firebaseio.com/ingredients/${selectedIngredient.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
+    }
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      // _isLoading = false;
+      // notifyListeners();
+      _ingredients[getSelectedIngredientIndex] = Ingredient(
+          id: selectedIngredient.id,
+          description: selectedIngredient.description,
+          image: selectedIngredient.image,
+          title: selectedIngredient.title,
+          userEmail: selectedIngredient.userEmail,
+          userId: selectedIngredient.userId,
+          isFavorite: !newFavoriteStatus);
+      return false;
+    }
+
+    // _isLoading = false;
+    notifyListeners();
+    return true;
+  }
+}
+
+////////////////////////////////////////USER MODEL////////////////////////////////////////////
 
 class UserModel extends ConnectedRecipesModel {
   Timer _authTimer;
