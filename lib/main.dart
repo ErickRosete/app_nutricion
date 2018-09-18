@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 //import 'package:flutter/rendering.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import './pages/calendar/calendar.dart';
+import './pages/media/images.dart';
+import './pages/media/videos.dart';
+import './pages/shopping/shopping_list.dart';
 import './pages/recipe/recipes.dart';
 import './pages/recipe/recipe.dart';
 import './pages/recipe/recipe_ingredients_list.dart';
@@ -55,6 +59,14 @@ class _MyAppState extends State<MyApp> {
         routes: {
           '/': (BuildContext context) =>
               _isAuthenticated ? RecipesPage(_model) : AuthPage(),
+          '/calendar': (BuildContext context) =>
+              _isAuthenticated ? CalendarPage() : AuthPage(),
+          '/images': (BuildContext context) =>
+              _isAuthenticated ? ImagesPage() : AuthPage(),
+          '/videos': (BuildContext context) =>
+              _isAuthenticated ? VideosPage() : AuthPage(),
+          '/shoppingList': (BuildContext context) =>
+              _isAuthenticated ? ShoppingListPage() : AuthPage(),
           '/ingredients': (BuildContext context) =>
               _isAuthenticated ? IngredientsPage(_model) : AuthPage(),
           '/recipesAdmin': (BuildContext context) =>

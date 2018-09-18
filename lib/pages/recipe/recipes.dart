@@ -6,6 +6,10 @@ import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
 import '../../widgets/ui_elements/drawer/ingredients_list_tile.dart';
 import '../../widgets/ui_elements/drawer/ingredients_admin_list_tile.dart';
 import '../../widgets/ui_elements/drawer/recipes_admin_list_tile.dart';
+import '../../widgets/ui_elements/drawer/calendar_list_tile.dart';
+import '../../widgets/ui_elements/drawer/shopping_list_tile.dart';
+import '../../widgets/ui_elements/drawer/images_list_tile.dart';
+import '../../widgets/ui_elements/drawer/videos_list_tile.dart';
 import '../../scoped-models/main.dart';
 
 class RecipesPage extends StatefulWidget {
@@ -42,6 +46,14 @@ class _RecipesPageState extends State<RecipesPage> {
             RecipesAdminListTile(),
             Divider(),
             IngredientsAdminListTile(),
+            Divider(),
+            CalendarListTile(),
+            Divider(),
+            ShoppingListTile(),
+            Divider(),
+            VideosListTile(),
+            Divider(),
+            ImagesListTile(),
             Divider(),
             LogoutListTile(),
           ],

@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../../scoped-models/main.dart';
-import './recipe_form.dart';
-import './recipe_list.dart';
 import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
-import '../../widgets/ui_elements/drawer/recipes_list_tile.dart';
 import '../../widgets/ui_elements/drawer/ingredients_list_tile.dart';
+import '../../widgets/ui_elements/drawer/recipes_list_tile.dart';
 import '../../widgets/ui_elements/drawer/ingredients_admin_list_tile.dart';
+import '../../widgets/ui_elements/drawer/recipes_admin_list_tile.dart';
 import '../../widgets/ui_elements/drawer/calendar_list_tile.dart';
 import '../../widgets/ui_elements/drawer/shopping_list_tile.dart';
 import '../../widgets/ui_elements/drawer/images_list_tile.dart';
-import '../../widgets/ui_elements/drawer/videos_list_tile.dart';
 
-class RecipesAdminPage extends StatelessWidget {
-  final MainModel model;
-
-  RecipesAdminPage(this.model);
-
+class VideosPage extends StatelessWidget {
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
       child: SingleChildScrollView(
@@ -32,18 +25,17 @@ class RecipesAdminPage extends StatelessWidget {
             Divider(),
             IngredientsListTile(),
             Divider(),
+            RecipesAdminListTile(),
+            Divider(),
             IngredientsAdminListTile(),
             Divider(),
             CalendarListTile(),
             Divider(),
             ShoppingListTile(),
             Divider(),
-            VideosListTile(),
-            Divider(),
             ImagesListTile(),
             Divider(),
             LogoutListTile(),
-            Divider(),
           ],
         ),
       ),
@@ -52,28 +44,18 @@ class RecipesAdminPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        drawer: _buildSideDrawer(context),
-        appBar: AppBar(
-          title: Text('Recipe Manager'),
-          bottom: TabBar(tabs: <Widget>[
-            Tab(
-              icon: Icon(Icons.create),
-              text: 'Create Recipe',
-            ),
-            Tab(
-              icon: Icon(Icons.list),
-              text: 'My Recipes',
-            ),
-          ]),
-        ),
-        // body: RecipeManager(startingRecipe:'Food Tester')
-        body: TabBarView(
+    return Scaffold(
+      drawer: _buildSideDrawer(context),
+      appBar: AppBar(
+        title: Text("Videos"),
+      ),
+      // body: IngredientManager(startingIngredient:'Food Tester')
+      body: SingleChildScrollView(
+        child: Column(
           children: <Widget>[
-            RecipeFormPage(),
-            RecipeListPage(model),
+            Center(
+              child: Text("Videos"),
+            ),
           ],
         ),
       ),
