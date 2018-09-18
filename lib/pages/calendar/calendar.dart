@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:scrolling_calendar/scrolling_calendar.dart';
 
 import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
 import '../../widgets/ui_elements/drawer/recipes_list_tile.dart';
@@ -10,6 +13,13 @@ import '../../widgets/ui_elements/drawer/images_list_tile.dart';
 import '../../widgets/ui_elements/drawer/videos_list_tile.dart';
 
 class CalendarPage extends StatelessWidget {
+  static final Random random = new Random();
+
+  static Iterable<Color> randomColors() => <Color>[]
+    ..addAll(random.nextBool() ? <Color>[] : <Color>[Colors.red])
+    ..addAll(random.nextBool() ? <Color>[] : <Color>[Colors.blue])
+    ..addAll(random.nextBool() ? <Color>[] : <Color>[Colors.green]);
+
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
       child: SingleChildScrollView(
@@ -45,20 +55,15 @@ class CalendarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: _buildSideDrawer(context),
-      appBar: AppBar(
-        title: Text("Calendar"),
-      ),
-      // body: IngredientManager(startingIngredient:'Food Tester')
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Center(
-              child: Text("Calendar"),
-            ),
-          ],
+        drawer: _buildSideDrawer(context),
+        appBar: AppBar(
+          title: Text("Calendar"),
         ),
-      ),
-    );
+        // body: IngredientManager(startingIngredient:'Food Tester')
+        body: new ScrollingCalendar(
+            firstDayOfWeek: DateTime.monday,
+            onDateTapped: (DateTime date) => Navigator.pushNamed(context, '/calendarDay'),
+            selectedDate: new DateTime(2018, 9, 18),
+            colorMarkers: (_) => randomColors()));
   }
 }

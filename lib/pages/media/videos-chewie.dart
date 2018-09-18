@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_youtube/flutter_youtube.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:chewie/chewie.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:video_player/video_player.dart';
 
-import '../../models/recipe.dart';
-import '../../scoped-models/main.dart';
 import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
 import '../../widgets/ui_elements/drawer/ingredients_list_tile.dart';
 import '../../widgets/ui_elements/drawer/recipes_list_tile.dart';
@@ -13,24 +12,22 @@ import '../../widgets/ui_elements/drawer/calendar_list_tile.dart';
 import '../../widgets/ui_elements/drawer/shopping_list_tile.dart';
 import '../../widgets/ui_elements/drawer/images_list_tile.dart';
 
-class VideosPage extends StatelessWidget {
-
-  void playYoutubeVideo() {
-    FlutterYoutube.playYoutubeVideoByUrl(
-      apiKey: "AIzaSyAsVjYW1xnpfyv0tKbAbYChqFKThpvWKMY",
-      videoUrl: "https://www.youtube.com/watch?v=fhWaJi1Hsfo",
-      autoPlay: true, //default falase
-      // fullScreen: true
-    );
+class VideosPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return new _VideosPageState();
   }
+}
 
-  Widget _buildViewVideoButton(
-      BuildContext context, int index, MainModel model) {
-    return IconButton(
-        icon: Icon(Icons.video_label),
-        onPressed: () {
-          playYoutubeVideo();
-        });
+class _VideosPageState extends State<VideosPage> {
+  VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = new VideoPlayerController.network(
+      'https://github.com/flutter/assets-for-api-docs/blob/master/assets/videos/butterfly.mp4?raw=true',
+    );
   }
 
   Widget _buildSideDrawer(BuildContext context) {
@@ -67,31 +64,28 @@ class VideosPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return new Scaffold(
       drawer: _buildSideDrawer(context),
       appBar: new AppBar(
-        title: new Text('Videos'),
+        title: new Text("Videos"),
       ),
-      body: ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget widget, MainModel model) {
-          return ListView.builder(
-              itemCount: model.getRecipes.length,
-              itemBuilder: (BuildContext context, int index) {
-                final Recipe recipe = model.getRecipes[index];
-                return Column(
-                  children: <Widget>[
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(recipe.image),
-                      ),
-                      title: Text(recipe.title),
-                      trailing: _buildViewVideoButton(context, index, model),
-                    ),
-                    Divider(),
-                  ],
-                );
-              });
-        },
+      body: new Column(
+        children: <Widget>[
+          new Expanded(
+            child: new Center(
+              child: new Chewie(
+                _controller,
+                aspectRatio: 3 / 2,
+                autoPlay: true,
+                looping: true,
+                placeholder: new Container(
+                  color: Colors.grey,
+                ),
+                //showControls: false,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

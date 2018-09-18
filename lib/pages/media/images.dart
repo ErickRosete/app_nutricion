@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 
+import '../../widgets/media/image-card.dart';
+import '../../models/recipe.dart';
+import '../../scoped-models/main.dart';
 import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
 import '../../widgets/ui_elements/drawer/recipes_list_tile.dart';
 import '../../widgets/ui_elements/drawer/ingredients_list_tile.dart';
@@ -42,6 +46,22 @@ class ImagesPage extends StatelessWidget {
     );
   }
 
+  Widget _buildImageList(BuildContext context, List<Recipe> recipes) {
+    Widget recipeCards;
+    if (recipes.length > 0) {
+      recipeCards = ListView.builder(
+        itemBuilder: (BuildContext context, int index) =>
+            ImageCard(recipes[index], index),
+        itemCount: recipes.length,
+      );
+    } else {
+      recipeCards = Center(
+        child: Text("No images found, please add some"),
+      );
+    }
+    return recipeCards;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,16 +69,10 @@ class ImagesPage extends StatelessWidget {
       appBar: AppBar(
         title: Text("Images"),
       ),
-      // body: IngredientManager(startingIngredient:'Food Tester')
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Center(
-              child: Text("Images"),
-            ),
-          ],
-        ),
-      ),
+      body: ScopedModelDescendant<MainModel>(
+          builder: (BuildContext context, Widget child, MainModel model) {
+        return _buildImageList(context, model.displayedRecipes);
+      }),
     );
   }
 }

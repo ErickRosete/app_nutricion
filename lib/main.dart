@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import './pages/calendar/calendar.dart';
+import './pages/calendar/calendar_day.dart';
 import './pages/media/images.dart';
 import './pages/media/videos.dart';
 import './pages/shopping/shopping_list.dart';
@@ -61,6 +62,8 @@ class _MyAppState extends State<MyApp> {
               _isAuthenticated ? RecipesPage(_model) : AuthPage(),
           '/calendar': (BuildContext context) =>
               _isAuthenticated ? CalendarPage() : AuthPage(),
+          '/calendarDay': (BuildContext context) =>
+              _isAuthenticated ? CalendarDayPage() : AuthPage(),
           '/images': (BuildContext context) =>
               _isAuthenticated ? ImagesPage() : AuthPage(),
           '/videos': (BuildContext context) =>

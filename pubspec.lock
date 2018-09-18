@@ -43,6 +43,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.2"
+  chewie:
+    dependency: "direct main"
+    description:
+      name: chewie
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.7.0"
   collection:
     dependency: transitive
     description:
@@ -104,6 +111,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_youtube:
+    dependency: "direct main"
+    description:
+      name: flutter_youtube
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.1"
   front_end:
     dependency: transitive
     description:
@@ -153,6 +167,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.4"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.15.7"
   io:
     dependency: transitive
     description:
@@ -223,6 +244,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.4.4"
+  open_iconic_flutter:
+    dependency: transitive
+    description:
+      name: open_iconic_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   package_config:
     dependency: transitive
     description:
@@ -293,6 +321,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.0"
+  scrolling_calendar:
+    dependency: "direct main"
+    description:
+      name: scrolling_calendar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.11"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -417,6 +452,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.8"
+  video_player:
+    dependency: transitive
+    description:
+      name: video_player
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.5"
   vm_service_client:
     dependency: transitive
     description:
@@ -454,4 +496,4 @@ packages:
     version: "2.1.15"
 sdks:
   dart: ">=2.0.0 <=2.1.0-dev.1.0.flutter-ccb16f7282"
-  flutter: ">=0.1.4 <2.0.0"
+  flutter: ">=0.2.5 <2.0.0"
