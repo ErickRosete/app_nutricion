@@ -52,6 +52,7 @@ class _MyAppState extends State<MyApp> {
     return ScopedModel<MainModel>(
       model: _model,
       child: MaterialApp(
+        title: "Nutrición",
         theme: ThemeData(
           primarySwatch: Colors.green,
           buttonColor: Colors.greenAccent,
