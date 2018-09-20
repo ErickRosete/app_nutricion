@@ -47,7 +47,7 @@ class RecipePage extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              ImageWithPlaceholder(recipe.image, 200.0),
+              ImageWithPlaceholder(recipe.image),
               TitleDefault(recipe.title),
               SizedBox(height: 10.0),
               _buildAddressPriceRow(recipe),
@@ -63,9 +63,9 @@ class RecipePage extends StatelessWidget {
               ),
               RaisedButton(
                 onPressed: () {
-                Navigator.pushNamed<bool>(
-                    context, "/Recipe/" + recipe.id + "/Ingredients");
-              },
+                  Navigator.pushNamed<bool>(
+                      context, "/Recipe/" + recipe.id + "/Ingredients");
+                },
                 child: Text("View Ingredients"),
               ),
             ],

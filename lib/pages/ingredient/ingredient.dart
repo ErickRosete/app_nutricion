@@ -25,7 +25,7 @@ class IngredientPage extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              ImageWithPlaceholder(ingredient.image, 200.0),
+              ImageWithPlaceholder(ingredient.image),
               TitleDefault(ingredient.title),
               SizedBox(height: 10.0),
               Container(

@@ -79,28 +79,33 @@ class _IngredientsPageState extends State<IngredientsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: _buildSideDrawer(context),
-      appBar: AppBar(
-        title: Text('App de nutrición'),
-        actions: <Widget>[
-          ScopedModelDescendant<MainModel>(
-            builder: (BuildContext context, Widget child, MainModel model) {
-              IconData favoriteIcon = model.displayIngredientsFavoritesOnly
-                  ? Icons.favorite
-                  : Icons.favorite_border;
-              return IconButton(
-                icon: Icon(favoriteIcon),
-                onPressed: () {
-                  model.toggleIngredientDisplayMode();
-                },
-              );
-            },
-          ),
-        ],
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.pushReplacementNamed(context, '/');
+      },
+      child: Scaffold(
+        drawer: _buildSideDrawer(context),
+        appBar: AppBar(
+          title: Text('App de nutrición'),
+          actions: <Widget>[
+            ScopedModelDescendant<MainModel>(
+              builder: (BuildContext context, Widget child, MainModel model) {
+                IconData favoriteIcon = model.displayIngredientsFavoritesOnly
+                    ? Icons.favorite
+                    : Icons.favorite_border;
+                return IconButton(
+                  icon: Icon(favoriteIcon),
+                  onPressed: () {
+                    model.toggleIngredientDisplayMode();
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+        // body: IngredientManager(startingIngredient:'Food Tester')
+        body: _buildIngredientsList(),
       ),
-      // body: IngredientManager(startingIngredient:'Food Tester')
-      body: _buildIngredientsList(),
     );
   }
 }

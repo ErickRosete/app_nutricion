@@ -54,7 +54,11 @@ class CalendarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.pushReplacementNamed(context, '/');
+      },
+      child: Scaffold(
         drawer: _buildSideDrawer(context),
         appBar: AppBar(
           title: Text("Calendar"),
@@ -62,8 +66,11 @@ class CalendarPage extends StatelessWidget {
         // body: IngredientManager(startingIngredient:'Food Tester')
         body: new ScrollingCalendar(
             firstDayOfWeek: DateTime.monday,
-            onDateTapped: (DateTime date) => Navigator.pushNamed(context, '/calendarDay'),
+            onDateTapped: (DateTime date) =>
+                Navigator.pushNamed(context, '/calendarDay'),
             selectedDate: new DateTime(2018, 9, 18),
-            colorMarkers: (_) => randomColors()));
+            colorMarkers: (_) => randomColors()),
+      ),
+    );
   }
 }

@@ -64,15 +64,20 @@ class ImagesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: _buildSideDrawer(context),
-      appBar: AppBar(
-        title: Text("Images"),
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.pushReplacementNamed(context, '/');
+      },
+      child: Scaffold(
+        drawer: _buildSideDrawer(context),
+        appBar: AppBar(
+          title: Text("Images"),
+        ),
+        body: ScopedModelDescendant<MainModel>(
+            builder: (BuildContext context, Widget child, MainModel model) {
+          return _buildImageList(context, model.displayedRecipes);
+        }),
       ),
-      body: ScopedModelDescendant<MainModel>(
-          builder: (BuildContext context, Widget child, MainModel model) {
-        return _buildImageList(context, model.displayedRecipes);
-      }),
     );
   }
 }

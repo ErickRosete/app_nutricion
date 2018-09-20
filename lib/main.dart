@@ -58,6 +58,7 @@ class _MyAppState extends State<MyApp> {
           buttonColor: Colors.greenAccent,
         ),
 //        home: AuthPage(),
+
         routes: {
           '/': (BuildContext context) =>
               _isAuthenticated ? RecipesPage(_model) : AuthPage(),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'dart:async';
 
 import '../../widgets/recipes/recipes.dart';
 import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
@@ -28,6 +29,27 @@ class _RecipesPageState extends State<RecipesPage> {
   initState() {
     super.initState();
     widget.model.fetchRecipes();
+  }
+
+  Future<bool> _onWillPop() {
+    return showDialog(
+          context: context,
+          builder: (context) => new AlertDialog(
+                title: new Text('Are you sure?'),
+                content: new Text('Do you want to exit an App'),
+                actions: <Widget>[
+                  new FlatButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: new Text('No'),
+                  ),
+                  new FlatButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: new Text('Yes'),
+                  ),
+                ],
+              ),
+        ) ??
+        false;
   }
 
   Widget _buildSideDrawer(BuildContext context) {
@@ -78,28 +100,31 @@ class _RecipesPageState extends State<RecipesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: _buildSideDrawer(context),
-      appBar: AppBar(
-        title: Text('App de nutrición'),
-        actions: <Widget>[
-          ScopedModelDescendant<MainModel>(
-            builder: (BuildContext context, Widget child, MainModel model) {
-              IconData favoriteIcon = model.displayRecipesFavoritesOnly
-                  ? Icons.favorite
-                  : Icons.favorite_border;
-              return IconButton(
-                icon: Icon(favoriteIcon),
-                onPressed: () {
-                  model.toggleRecipeDisplayMode();
-                },
-              );
-            },
-          ),
-        ],
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        drawer: _buildSideDrawer(context),
+        appBar: AppBar(
+          title: Text('App de nutrición'),
+          actions: <Widget>[
+            ScopedModelDescendant<MainModel>(
+              builder: (BuildContext context, Widget child, MainModel model) {
+                IconData favoriteIcon = model.displayRecipesFavoritesOnly
+                    ? Icons.favorite
+                    : Icons.favorite_border;
+                return IconButton(
+                  icon: Icon(favoriteIcon),
+                  onPressed: () {
+                    model.toggleRecipeDisplayMode();
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+        // body: RecipeManager(startingRecipe:'Food Tester')
+        body: _buildRecipesList(),
       ),
-      // body: RecipeManager(startingRecipe:'Food Tester')
-      body: _buildRecipesList(),
     );
   }
 }

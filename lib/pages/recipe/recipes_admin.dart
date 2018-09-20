@@ -54,27 +54,32 @@ class RecipesAdminPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
-        drawer: _buildSideDrawer(context),
-        appBar: AppBar(
-          title: Text('Recipe Manager'),
-          bottom: TabBar(tabs: <Widget>[
-            Tab(
-              icon: Icon(Icons.create),
-              text: 'Create Recipe',
-            ),
-            Tab(
-              icon: Icon(Icons.list),
-              text: 'My Recipes',
-            ),
-          ]),
-        ),
-        // body: RecipeManager(startingRecipe:'Food Tester')
-        body: TabBarView(
-          children: <Widget>[
-            RecipeFormPage(),
-            RecipeListPage(model),
-          ],
+      child: WillPopScope(
+        onWillPop: () {
+          Navigator.pushReplacementNamed(context, '/');
+        },
+        child: Scaffold(
+          drawer: _buildSideDrawer(context),
+          appBar: AppBar(
+            title: Text('Recipe Manager'),
+            bottom: TabBar(tabs: <Widget>[
+              Tab(
+                icon: Icon(Icons.create),
+                text: 'Create Recipe',
+              ),
+              Tab(
+                icon: Icon(Icons.list),
+                text: 'My Recipes',
+              ),
+            ]),
+          ),
+          // body: RecipeManager(startingRecipe:'Food Tester')
+          body: TabBarView(
+            children: <Widget>[
+              RecipeFormPage(),
+              RecipeListPage(model),
+            ],
+          ),
         ),
       ),
     );

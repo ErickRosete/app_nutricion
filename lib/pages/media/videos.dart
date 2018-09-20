@@ -14,7 +14,6 @@ import '../../widgets/ui_elements/drawer/shopping_list_tile.dart';
 import '../../widgets/ui_elements/drawer/images_list_tile.dart';
 
 class VideosPage extends StatelessWidget {
-
   void playYoutubeVideo() {
     FlutterYoutube.playYoutubeVideoByUrl(
       apiKey: "AIzaSyAsVjYW1xnpfyv0tKbAbYChqFKThpvWKMY",
@@ -67,31 +66,36 @@ class VideosPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: _buildSideDrawer(context),
-      appBar: new AppBar(
-        title: new Text('Videos'),
-      ),
-      body: ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget widget, MainModel model) {
-          return ListView.builder(
-              itemCount: model.getRecipes.length,
-              itemBuilder: (BuildContext context, int index) {
-                final Recipe recipe = model.getRecipes[index];
-                return Column(
-                  children: <Widget>[
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(recipe.image),
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.pushReplacementNamed(context, '/');
+      },
+      child: Scaffold(
+        drawer: _buildSideDrawer(context),
+        appBar: new AppBar(
+          title: new Text('Videos'),
+        ),
+        body: ScopedModelDescendant<MainModel>(
+          builder: (BuildContext context, Widget widget, MainModel model) {
+            return ListView.builder(
+                itemCount: model.getRecipes.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final Recipe recipe = model.getRecipes[index];
+                  return Column(
+                    children: <Widget>[
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(recipe.image),
+                        ),
+                        title: Text(recipe.title),
+                        trailing: _buildViewVideoButton(context, index, model),
                       ),
-                      title: Text(recipe.title),
-                      trailing: _buildViewVideoButton(context, index, model),
-                    ),
-                    Divider(),
-                  ],
-                );
-              });
-        },
+                      Divider(),
+                    ],
+                  );
+                });
+          },
+        ),
       ),
     );
   }

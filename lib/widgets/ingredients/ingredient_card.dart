@@ -27,29 +27,18 @@ class IngredientCard extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        return ButtonBar(
-          alignment: MainAxisAlignment.center,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.info),
-              color: Colors.blue,
-              onPressed: () {
-                Navigator.pushNamed<bool>(
-                    context, "/Ingredient/" + model.getIngredients[ingredientIndex].id);
-              },
-            ),
-            IconButton(
-              icon: Icon(model.getIngredients[ingredientIndex].isFavorite || model.displayIngredientsFavoritesOnly
-                  ? Icons.favorite
-                  : Icons.favorite_border),
-              color: Colors.red,
-              onPressed: () {
-                model.setSelectedIngredient(model.getIngredients[ingredientIndex].id);
-                model.toggleIngredientFavoriteStatus();
-                model.setSelectedIngredient(null);
-              },
-            ),
-          ],
+        return IconButton(
+          icon: Icon(model.getIngredients[ingredientIndex].isFavorite ||
+                  model.displayIngredientsFavoritesOnly
+              ? Icons.favorite
+              : Icons.favorite_border),
+          color: Colors.red,
+          onPressed: () {
+            model.setSelectedIngredient(
+                model.getIngredients[ingredientIndex].id);
+            model.toggleIngredientFavoriteStatus();
+            model.setSelectedIngredient(null);
+          },
         );
       },
     );
@@ -58,20 +47,29 @@ class IngredientCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Card(
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            ImageWithPlaceholder(ingredient.image),
-            SizedBox(height: 10.0),
-            Container(
-              margin: EdgeInsets.only(top: 10.0),
-              child: _buildTitlePriceRow(),
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.pushNamed<bool>(context,
+                "/Ingredient/" + model.getIngredients[ingredientIndex].id);
+          },
+          child: Card(
+            child: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  ImageWithPlaceholder(ingredient.image),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: _buildTitlePriceRow(),
+                  ),
+                  _buildActionButtons(context),
+                ],
+              ),
             ),
-            _buildActionButtons(context),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

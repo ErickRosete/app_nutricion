@@ -47,41 +47,46 @@ class ShoppingListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: _buildSideDrawer(context),
-      appBar: new AppBar(
-        title: new Text('Shopping List'),
-      ),
-      body: ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget widget, MainModel model) {
-          return ListView.builder(
-              itemCount: model.getIngredients.length,
-              itemBuilder: (BuildContext context, int index) {
-                if (model.getShopItems.length < index + 1) {
-                  final ShopItem shopItem = new ShopItem(
-                      ingredient: model.getIngredients[index], bought: false);
-                  model.addShopItem(shopItem);
-                }
-                return Column(
-                  children: <Widget>[
-                    SwitchListTile(
-                      secondary: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                            model.getShopItems[index].ingredient.image),
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.pushReplacementNamed(context, '/');
+      },
+      child: Scaffold(
+        drawer: _buildSideDrawer(context),
+        appBar: new AppBar(
+          title: new Text('Shopping List'),
+        ),
+        body: ScopedModelDescendant<MainModel>(
+          builder: (BuildContext context, Widget widget, MainModel model) {
+            return ListView.builder(
+                itemCount: model.getIngredients.length,
+                itemBuilder: (BuildContext context, int index) {
+                  if (model.getShopItems.length < index + 1) {
+                    final ShopItem shopItem = new ShopItem(
+                        ingredient: model.getIngredients[index], bought: false);
+                    model.addShopItem(shopItem);
+                  }
+                  return Column(
+                    children: <Widget>[
+                      SwitchListTile(
+                        secondary: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                              model.getShopItems[index].ingredient.image),
+                        ),
+                        value: model.getShopItems[index].bought,
+                        onChanged: (bool value) {
+                          model.setSelectedShopItem(index);
+                          model.toggleBoughtStatus();
+                          model.setSelectedShopItem(null);
+                        },
+                        title: Text(model.getShopItems[index].ingredient.title),
                       ),
-                      value: model.getShopItems[index].bought,
-                      onChanged: (bool value) {
-                        model.setSelectedShopItem(index);
-                        model.toggleBoughtStatus();
-                        model.setSelectedShopItem(null);
-                      },
-                      title: Text(model.getShopItems[index].ingredient.title),
-                    ),
-                    Divider(),
-                  ],
-                );
-              });
-        },
+                      Divider(),
+                    ],
+                  );
+                });
+          },
+        ),
       ),
     );
   }
