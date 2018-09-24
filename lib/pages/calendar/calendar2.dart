@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:intl/intl.dart';
+import 'dart:math';
 
-import '../../scoped-models/main.dart';
+import 'package:flutter/material.dart';
+import 'package:scrolling_calendar/scrolling_calendar.dart';
+
 import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
 import '../../widgets/ui_elements/drawer/recipes_list_tile.dart';
 import '../../widgets/ui_elements/drawer/ingredients_list_tile.dart';
@@ -13,6 +13,13 @@ import '../../widgets/ui_elements/drawer/images_list_tile.dart';
 import '../../widgets/ui_elements/drawer/videos_list_tile.dart';
 
 class CalendarPage extends StatelessWidget {
+  static final Random random = new Random();
+
+  static Iterable<Color> randomColors() => <Color>[]
+    ..addAll(random.nextBool() ? <Color>[] : <Color>[Colors.red])
+    ..addAll(random.nextBool() ? <Color>[] : <Color>[Colors.blue])
+    ..addAll(random.nextBool() ? <Color>[] : <Color>[Colors.green]);
+
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
       child: SingleChildScrollView(
@@ -45,13 +52,6 @@ class CalendarPage extends StatelessWidget {
     );
   }
 
-  Image _dayImage(DateTime date) {
-    return Image.asset(
-      "assets/icons/" + DateFormat('EEEE').format(date) + ".png",
-      fit: BoxFit.contain,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -59,39 +59,18 @@ class CalendarPage extends StatelessWidget {
         Navigator.pushReplacementNamed(context, '/');
       },
       child: Scaffold(
-          drawer: _buildSideDrawer(context),
-          appBar: AppBar(
-            title: Text("Calendar"),
-          ),
-          body: ScopedModelDescendant<MainModel>(
-            builder: (BuildContext context, Widget child, MainModel model) {
-              if (model.getDates.length < 1) model.calculateDays();
-
-              return ListView.builder(
-                itemCount: model.getDates.length,
-                itemBuilder: (context, index) {
-                  final DateTime date = model.getDates[index];
-                  return Column(
-                    children: <Widget>[
-                      ListTile(
-                        leading: CircleAvatar(
-                          child: _dayImage(date),
-                          backgroundColor: Colors.transparent,
-                        ),
-                        title: Text(DateFormat.yMMMMd("es").format(date)),
-                        subtitle: Text(DateFormat.EEEE('es').format(date)),
-                        onTap: () {
-                          model.setSelectedDate(index);
-                          Navigator.pushNamed(context, '/calendarDay');
-                        },
-                      ),
-                      Divider(),
-                    ],
-                  );
-                },
-              );
-            },
-          )),
+        drawer: _buildSideDrawer(context),
+        appBar: AppBar(
+          title: Text("Calendar"),
+        ),
+        // body: IngredientManager(startingIngredient:'Food Tester')
+        body: new ScrollingCalendar(
+            firstDayOfWeek: DateTime.monday,
+            onDateTapped: (DateTime date) =>
+                Navigator.pushNamed(context, '/calendarDay'),
+            selectedDate: new DateTime(2018, 9, 18),
+            colorMarkers: (_) => randomColors()),
+      ),
     );
   }
 }

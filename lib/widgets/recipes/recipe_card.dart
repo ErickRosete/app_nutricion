@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import './price_tag.dart';
-import './address_tag.dart';
+// import './address_tag.dart';
 import '../ui_elements/title_default.dart';
 import '../ui_elements/image_with_placeholder.dart';
 import '../../models/recipe.dart';
@@ -46,18 +46,19 @@ class RecipeCard extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, MainModel model) {
-    return IconButton(
-      icon: Icon(model.getRecipes[recipeIndex].isFavorite ||
-              model.displayRecipesFavoritesOnly
-          ? Icons.favorite
-          : Icons.favorite_border),
-      color: Colors.red,
-      onPressed: () {
-        model.setSelectedRecipe(model.getRecipes[recipeIndex].id);
-        model.toggleRecipeFavoriteStatus();
-        model.setSelectedRecipe(null);
-      },
-    );
+    return !model.displayRecipesFavoritesOnly
+        ? IconButton(
+            icon: Icon(model.getRecipes[recipeIndex].isFavorite
+                ? Icons.favorite
+                : Icons.favorite_border),
+            color: Colors.red,
+            onPressed: () {
+              model.setSelectedRecipe(model.getRecipes[recipeIndex].id);
+              model.toggleRecipeFavoriteStatus();
+              model.setSelectedRecipe(null);
+            },
+          )
+        : Container();
   }
 
   @override
@@ -79,7 +80,7 @@ class RecipeCard extends StatelessWidget {
                     margin: EdgeInsets.only(top: 10.0),
                     child: _buildTitlePriceRow(context),
                   ),
-                  AddressTag('Union Square, San Francisco'),
+                  // AddressTag('Union Square, San Francisco'),
                   _buildActionButtons(context, model),
                 ],
               ),

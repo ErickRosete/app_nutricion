@@ -36,7 +36,7 @@ class _AuthPageState extends State<AuthPage> {
   Widget _buildEmailTextField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: 'E-Mail',
+        labelText: 'Correo electrónico',
         filled: true,
         fillColor: Colors.white,
       ),
@@ -45,7 +45,7 @@ class _AuthPageState extends State<AuthPage> {
         String emailRegExp =
             r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$";
         if (value.isEmpty || !RegExp(emailRegExp).hasMatch(value)) {
-          return "Please enter a valid E-mail";
+          return "Correo electrónico válido";
         }
         return null;
       },
@@ -60,13 +60,13 @@ class _AuthPageState extends State<AuthPage> {
       controller: _passwordTextController,
       obscureText: true,
       decoration: InputDecoration(
-        labelText: 'Password',
+        labelText: 'Contraseña',
         filled: true,
         fillColor: Colors.white,
       ),
       validator: (String value) {
         if (value.isEmpty || value.length < 4) {
-          return "Invalid Password";
+          return "Contraseña inválida";
         }
         return null;
       },
@@ -112,7 +112,7 @@ class _AuthPageState extends State<AuthPage> {
     _formKey.currentState.save();
 
     Map<String, dynamic> successInformation = await authenticate(
-        _formData['email'], _formData['password'], _authMode);
+        _formData['email'], _formData['password'], AuthMode.Login);
 
     if (successInformation['success']) {
       Navigator.pushReplacementNamed(context, '/');
@@ -121,7 +121,7 @@ class _AuthPageState extends State<AuthPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('An Error Ocurred!'),
+              title: Text('Ha ocurrido un error!'),
               content: Text(successInformation['message']),
               actions: <Widget>[
                 FlatButton(
@@ -169,18 +169,18 @@ class _AuthPageState extends State<AuthPage> {
                         ? _buildAcceptSwitch()
                         : Container(),
                     SizedBox(height: 10.0),
-                    FlatButton(
-                      child: Text(
-                          'Switch to ${_authMode == AuthMode.Login ? 'Signup' : 'Login'}'),
-                      onPressed: () {
-                        setState(() {
-                          _authMode = _authMode == AuthMode.Login
-                              ? AuthMode.Signup
-                              : AuthMode.Login;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 10.0),
+                    // FlatButton(
+                    //   child: Text(
+                    //       'Switch to ${_authMode == AuthMode.Login ? 'Signup' : 'Login'}'),
+                    //   onPressed: () {
+                    //     setState(() {
+                    //       _authMode = _authMode == AuthMode.Login
+                    //           ? AuthMode.Signup
+                    //           : AuthMode.Login;
+                    //     });
+                    //   },
+                    // ),
+                    // SizedBox(height: 10.0),
                     ScopedModelDescendant<MainModel>(
                       builder: (BuildContext context, Widget child,
                           MainModel model) {

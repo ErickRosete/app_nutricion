@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 //import 'package:flutter/rendering.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import './pages/calendar/calendar.dart';
 import './pages/calendar/calendar_day.dart';
@@ -39,6 +40,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting();
     _model.autoAuthenticate();
     _model.userSubject.listen((dynamic isAuthenticated) {
       setState(() {

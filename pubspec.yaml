@@ -47,6 +47,13 @@ flutter:
     - assets/placeholder.png
     - assets/placeholder_logo.png
 
+    - assets/icons/Monday.png
+    - assets/icons/Tuesday.png
+    - assets/icons/Wednesday.png
+    - assets/icons/Thursday.png
+    - assets/icons/Friday.png
+    - assets/icons/Saturday.png
+    - assets/icons/Sunday.png
 
 
   #  - images/a_dot_ham.jpeg

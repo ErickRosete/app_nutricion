@@ -1,13 +1,19 @@
+import 'package:scoped_model/scoped_model.dart';
+import 'package:intl/intl.dart';
 import 'package:side_header_list_view/side_header_list_view.dart';
 import 'package:flutter/material.dart';
 
-class CalendarDayPage extends StatelessWidget {
+import '../../scoped-models/main.dart';
 
- @override
+class CalendarDayPage extends StatelessWidget {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+
+              return Scaffold(
       appBar: AppBar(
-        title: Text("Calendar - day"),
+        title: Text(DateFormat.EEEE('es').format(model.getSelectedDate)),
       ),
       // body: IngredientManager(startingIngredient:'Food Tester')
       body: new SideHeaderListView(
@@ -33,6 +39,7 @@ class CalendarDayPage extends StatelessWidget {
         },
       ),
     );
+        });
   }
 }
 
@@ -88,4 +95,3 @@ const names = const <String>[
   'Taisha',
   'Zula',
 ];
-
