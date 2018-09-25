@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../ui_elements/title_default.dart';
-import '../ui_elements/image_with_placeholder.dart';
 import '../../models/recipe.dart';
 
 class ImageCard extends StatelessWidget {
@@ -10,32 +8,30 @@ class ImageCard extends StatelessWidget {
 
   ImageCard(this.recipe, this.recipeIndex);
 
-  Widget _buildTitleRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        TitleDefault(recipe.title),
-        SizedBox(
-          width: 8.0,
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Card(
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            ImageWithPlaceholder(recipe.image),
-            SizedBox(height: 10.0),
-            Container(
-              margin: EdgeInsets.only(top: 10.0),
-              child: _buildTitleRow(),
-            ),
-          ],
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10.0),
+      constraints: new BoxConstraints.expand(
+          height: MediaQuery.of(context).size.height / 4),
+      alignment: Alignment.bottomCenter,
+      decoration: new BoxDecoration(
+        image: new DecorationImage(
+          image: new NetworkImage(recipe.image),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        color: Colors.black.withOpacity(.7),
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 15.0),
+        child: Text(
+          recipe.title,
+          textAlign: TextAlign.center,
+          style: new TextStyle(
+            color: Colors.white,
+            fontSize: 26.0,
+          ),
         ),
       ),
     );

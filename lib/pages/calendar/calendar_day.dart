@@ -1,8 +1,9 @@
 import 'package:scoped_model/scoped_model.dart';
 import 'package:intl/intl.dart';
-import 'package:side_header_list_view/side_header_list_view.dart';
 import 'package:flutter/material.dart';
 
+import '../../widgets/calendar/calendar_food_card.dart';
+import '../../models/food.dart';
 import '../../scoped-models/main.dart';
 
 class CalendarDayPage extends StatelessWidget {
@@ -10,88 +11,19 @@ class CalendarDayPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-
-              return Scaffold(
-      appBar: AppBar(
-        title: Text(DateFormat.EEEE('es').format(model.getSelectedDate)),
-      ),
-      // body: IngredientManager(startingIngredient:'Food Tester')
-      body: new SideHeaderListView(
-        itemCount: names.length,
-        padding: new EdgeInsets.all(16.0),
-        itemExtend: 48.0,
-        headerBuilder: (BuildContext context, int index) {
-          return new SizedBox(
-              width: 32.0,
-              child: new Text(
-                names[index].substring(0, 1),
-                style: Theme.of(context).textTheme.headline,
-              ));
-        },
-        itemBuilder: (BuildContext context, int index) {
-          return new Text(
-            names[index],
-            style: Theme.of(context).textTheme.headline,
-          );
-        },
-        hasSameHeader: (int a, int b) {
-          return names[a].substring(0, 1) == names[b].substring(0, 1);
-        },
-      ),
-    );
-        });
+      return Scaffold(
+          appBar: AppBar(
+            title: Text(DateFormat.MMMMEEEEd('es')
+                .format(model.getSelectedDate.dateTime)),
+          ),
+          // body: IngredientManager(startingIngredient:'Food Tester')
+          body: ListView.builder(
+            itemCount: model.getSelectedDate.foods.length,
+            itemBuilder: (BuildContext context, int index) {
+              final Food food = model.getSelectedDate.foods[index];
+              return CalendarFoodCard(food);
+            },
+          ));
+    });
   }
 }
-
-const names = const <String>[
-  'Annie',
-  'Arianne',
-  'Bertie',
-  'Bettina',
-  'Bradly',
-  'Caridad',
-  'Carline',
-  'Cassie',
-  'Chloe',
-  'Christin',
-  'Clotilde',
-  'Dahlia',
-  'Dana',
-  'Dane',
-  'Darline',
-  'Deena',
-  'Delphia',
-  'Donny',
-  'Echo',
-  'Else',
-  'Ernesto',
-  'Fidel',
-  'Gayla',
-  'Grayce',
-  'Henriette',
-  'Hermila',
-  'Hugo',
-  'Irina',
-  'Ivette',
-  'Jeremiah',
-  'Jerica',
-  'Joan',
-  'Johnna',
-  'Jonah',
-  'Joseph',
-  'Junie',
-  'Linwood',
-  'Lore',
-  'Louis',
-  'Merry',
-  'Minna',
-  'Mitsue',
-  'Napoleon',
-  'Paris',
-  'Ryan',
-  'Salina',
-  'Shantae',
-  'Sonia',
-  'Taisha',
-  'Zula',
-];

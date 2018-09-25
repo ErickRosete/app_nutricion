@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:intl/intl.dart';
 
+import '../../models/date.dart';
 import '../../scoped-models/main.dart';
 import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
 import '../../widgets/ui_elements/drawer/recipes_list_tile.dart';
@@ -70,16 +71,16 @@ class CalendarPage extends StatelessWidget {
               return ListView.builder(
                 itemCount: model.getDates.length,
                 itemBuilder: (context, index) {
-                  final DateTime date = model.getDates[index];
+                  final Date date = model.getDates[index];
                   return Column(
                     children: <Widget>[
                       ListTile(
                         leading: CircleAvatar(
-                          child: _dayImage(date),
+                          child: _dayImage(date.dateTime),
                           backgroundColor: Colors.transparent,
                         ),
-                        title: Text(DateFormat.yMMMMd("es").format(date)),
-                        subtitle: Text(DateFormat.EEEE('es').format(date)),
+                        title: Text(DateFormat.yMMMMd("es").format(date.dateTime)),
+                        subtitle: Text(DateFormat.EEEE('es').format(date.dateTime)),
                         onTap: () {
                           model.setSelectedDate(index);
                           Navigator.pushNamed(context, '/calendarDay');

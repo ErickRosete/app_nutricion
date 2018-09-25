@@ -10,6 +10,8 @@ import '../models/ingredient.dart';
 import '../models/recipe.dart';
 import '../models/user.dart';
 import '../models/auth.dart';
+import '../models/date.dart';
+import '../models/food.dart';
 
 ////////////////////////////////////////CONNECTED RECIPES MODEL////////////////////////////////////////////
 class ConnectedRecipesModel extends Model {
@@ -239,7 +241,6 @@ class RecipesModel extends ConnectedRecipesModel {
   }
 
   List<Ingredient> fetchIngredientsByIds(Map<String, dynamic> ingredientsMap) {
-    
     List<Ingredient> ingredients = new List<Ingredient>();
 
     ingredientsMap.forEach(
@@ -672,6 +673,49 @@ class UserModel extends ConnectedRecipesModel {
     _authTimer = Timer(Duration(seconds: time), logout);
   }
 }
+
+///////////////////////////////////////////////////////////Date Model/////////////////////////////////////////////////
+
+class DatesModel extends ConnectedRecipesModel {
+  List<Date> _dates = [];
+  int _selectedDate;
+
+  void calculateDays() {
+    var now = new DateTime.now();
+    for (int i = 0; i < 7; i++) {
+
+      List<Food> foodsOfDay = new List<Food>();
+      Food food = new Food(recipe: _recipes[0], timeToEat: "Desayuno");
+      foodsOfDay.add(food);
+      food = new Food(recipe: _recipes[1], timeToEat: "Merienda-1");
+      foodsOfDay.add(food);
+      food = new Food(recipe: _recipes[2], timeToEat: "Comida");
+      foodsOfDay.add(food);
+      food = new Food(recipe: _recipes[3], timeToEat: "Merienda-2");
+      foodsOfDay.add(food);
+      food = new Food(recipe: _recipes[4], timeToEat: "Cena");
+      foodsOfDay.add(food);
+
+      var dateTimeToAdd = now.add(new Duration(days: i));
+      Date dayToAdd = new Date(dateTime: dateTimeToAdd, foods: foodsOfDay);
+      _dates.add(dayToAdd);
+    }
+  }
+
+  List<Date> get getDates {
+    return List.from(_dates);
+  }
+
+  void setSelectedDate(int index) {
+    _selectedDate = index;
+  }
+
+  Date get getSelectedDate {
+    return _dates[_selectedDate];
+  }
+}
+
+/////////////////////////////////////////////////////////Utility Model////////////////////////////////////////////////////
 
 class UtilityModel extends ConnectedRecipesModel {
   bool get isLoading {
