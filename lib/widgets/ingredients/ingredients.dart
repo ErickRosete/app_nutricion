@@ -11,7 +11,7 @@ class Ingredients extends StatelessWidget {
 
     Widget ingredientCards;
     if (ingredients.length > 0) {
-      ingredientCards =       OrientationBuilder(
+      ingredientCards = OrientationBuilder(
         builder: (context, orientation) {
           return GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

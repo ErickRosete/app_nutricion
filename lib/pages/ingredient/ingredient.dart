@@ -19,14 +19,14 @@ class IngredientPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(ingredient.title),
+          title: Text(ingredient.name),
         ),
         // body: IngredientManager(startingIngredient:'Food Tester')
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
               ImageWithPlaceholder(ingredient.image),
-              TitleDefault(ingredient.title),
+              TitleDefault(ingredient.name),
               SizedBox(height: 10.0),
               Container(
                 margin: EdgeInsets.all(10.0),

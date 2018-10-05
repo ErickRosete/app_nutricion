@@ -26,7 +26,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
 
   Widget _buildTitleTextField(Recipe recipe) {
     return TextFormField(
-      initialValue: recipe == null ? '' : recipe.title,
+      initialValue: recipe == null ? '' : recipe.name,
       decoration: InputDecoration(labelText: 'Recipe Title'),
       validator: (String value) {
         if (value.isEmpty || value.length < 5) {
@@ -43,7 +43,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
   Widget _buildDescriptionTextField(Recipe recipe) {
     return TextFormField(
       maxLines: 4,
-      initialValue: recipe == null ? '' : recipe.description,
+      initialValue: recipe == null ? '' : recipe.directions,
       decoration: InputDecoration(labelText: 'Recipe Description'),
       validator: (String value) {
         if (value.isEmpty || value.length < 10) {
@@ -57,23 +57,23 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
     );
   }
 
-  Widget _buildPriceTextField(Recipe recipe) {
-    return TextFormField(
-      initialValue: recipe == null ? '' : recipe.price.toString(),
-      decoration: InputDecoration(labelText: 'Recipe Price'),
-      validator: (String value) {
-        if (value.isEmpty ||
-            !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
-          return 'Price is required and should be a number.';
-        }
-        return null;
-      },
-      keyboardType: TextInputType.number,
-      onSaved: (String value) {
-        _formData['price'] = double.parse(value);
-      },
-    );
-  }
+  // Widget _buildCaloriesTextField(Recipe recipe) {
+  //   return TextFormField(
+  //     initialValue: recipe == null ? '' : calories.toString(),
+  //     decoration: InputDecoration(labelText: 'Recipe Calories'),
+  //     validator: (String value) {
+  //       if (value.isEmpty ||
+  //           !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
+  //         return 'Calories are required and should be a number.';
+  //       }
+  //       return null;
+  //     },
+  //     keyboardType: TextInputType.number,
+  //     onSaved: (String value) {
+  //       _formData['calories'] = double.parse(value);
+  //     },
+  //   );
+  // }
 
   Widget _buildSubmitButton(MainModel model) {
     return model.isLoading
@@ -117,7 +117,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
         _formData['title'],
         _formData['description'],
         _formData['image'],
-        _formData['price'],
+//        _formData['calories'],
       ).then((bool success) {
         _errorManagement(success, setSelectedRecipe);
       });
@@ -126,7 +126,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
         _formData['title'],
         _formData['description'],
         _formData['image'],
-        _formData['price'],
+//        _formData['calories'],
       ).then((bool success) {
         _errorManagement(success, setSelectedRecipe);
       });
@@ -152,7 +152,6 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
             children: <Widget>[
               _buildTitleTextField(recipe),
               _buildDescriptionTextField(recipe),
-              _buildPriceTextField(recipe),
               SizedBox(
                 height: 10.0,
               ),

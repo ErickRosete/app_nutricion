@@ -87,7 +87,7 @@ class VideosPage extends StatelessWidget {
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage(recipe.image),
                         ),
-                        title: Text(recipe.title),
+                        title: Text(recipe.name),
                         trailing: _buildViewVideoButton(context, index, model),
                       ),
                       Divider(),

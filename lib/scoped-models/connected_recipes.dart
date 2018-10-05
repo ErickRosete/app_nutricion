@@ -17,27 +17,25 @@ import '../models/food.dart';
 class ConnectedRecipesModel extends Model {
   List<Recipe> _recipes = [];
   List<Ingredient> _ingredients = [];
-  String _selectedRecipeId;
+  int _selectedRecipeId;
   User _authenticatedUser;
   bool _isLoading = false;
 
   Future<bool> addRecipe(
-      String title, String description, String image, double price) async {
+      String name, String directions, String image, double price) async {
     _isLoading = true;
     notifyListeners();
 
     final Map<String, dynamic> recipeData = {
-      'title': title,
-      'description': description,
-      'image':
+      'Name': name,
+      'Directions': directions,
+      'Image':
           'http://as01.epimg.net/deporteyvida/imagenes/2018/05/07/portada/1525714597_852564_1525714718_noticia_normal.jpg',
-      'price': price,
-      'userEmail': _authenticatedUser.email,
-      'userId': _authenticatedUser.id
     };
+
     try {
       final http.Response response = await http.post(
-          'https://app-de-nutricion.firebaseio.com/recipes.json?auth=${_authenticatedUser.token}',
+          'http://astradev-001-site10.ftempurl.com/api/Recipes/AddRecipe',
           body: json.encode(recipeData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -48,21 +46,11 @@ class ConnectedRecipesModel extends Model {
 
       final Map<String, dynamic> responseData = json.decode(response.body);
       Recipe newRecipe = Recipe(
-          id: responseData['name'],
-          title: title,
-          description: description,
+          id: responseData['id'],
+          name: name,
+          directions: directions,
           image: image,
-          price: price,
-          userEmail: _authenticatedUser.email,
-          userId: _authenticatedUser.id,
           ingredients: new List<Ingredient>());
-
-      //Make sure ingredients have been fetched
-      await fetchIngredients();
-      //Adding manually first ingredient
-      if (_ingredients != null && _ingredients.length > 0) {
-        addIngredientToRecipe(newRecipe, _ingredients[0]);
-      }
 
       _recipes.add(newRecipe);
 
@@ -78,11 +66,8 @@ class ConnectedRecipesModel extends Model {
 
   Future<bool> addIngredientToRecipe(
       Recipe recipe, Ingredient ingredient) async {
-    // _isLoading = true;
-    // notifyListeners();
-    http.Response response;
-    response = await http.put(
-        'https://app-de-nutricion.firebaseio.com/recipes/${recipe.id}/ingredients/${ingredient.id}.json?auth=${_authenticatedUser.token}',
+    http.Response response = await http.put(
+        'http://astradev-001-site10.ftempurl.com/api/Recipes/AddIngredientToRecipe?IngredientId=${ingredient.id}&RecipeId=${recipe.id}',
         body: json.encode(true));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -91,49 +76,6 @@ class ConnectedRecipesModel extends Model {
     }
 
     return false;
-  }
-
-  Future<bool> fetchIngredients({bool onlyForUser = false}) {
-    _isLoading = true;
-    notifyListeners();
-
-    return http
-        .get(
-            'https://app-de-nutricion.firebaseio.com/ingredients.json?auth=${_authenticatedUser.token}')
-        .then((http.Response response) {
-      final List<Ingredient> fetchedIngredientList = [];
-      final Map<String, dynamic> ingredientListData =
-          json.decode(response.body);
-      if (ingredientListData != null) {
-        ingredientListData
-            .forEach((String ingredientId, dynamic ingredientData) {
-          final Ingredient ingredient = Ingredient(
-              id: ingredientId,
-              title: ingredientData['title'],
-              description: ingredientData['description'],
-              image: ingredientData['image'],
-              userEmail: ingredientData['userEmail'],
-              userId: ingredientData['userId'],
-              isFavorite: ingredientData['wishlistUsers'] != null
-                  ? (ingredientData['wishlistUsers'] as Map<String, dynamic>)
-                      .containsKey(_authenticatedUser.id)
-                  : false);
-          fetchedIngredientList.add(ingredient);
-        });
-        _ingredients = onlyForUser
-            ? fetchedIngredientList.where((Ingredient ingredient) {
-                return ingredient.userId == _authenticatedUser.id;
-              }).toList()
-            : fetchedIngredientList;
-      }
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    }).catchError((error) {
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    });
   }
 }
 
@@ -152,7 +94,7 @@ class RecipesModel extends ConnectedRecipesModel {
     return List.from(_recipes);
   }
 
-  String get getSelectedRecipeId {
+  int get getSelectedRecipeId {
     return _selectedRecipeId;
   }
 
@@ -173,34 +115,27 @@ class RecipesModel extends ConnectedRecipesModel {
     });
   }
 
-  Future<bool> updateRecipe(
-      String title, String description, String image, double price) {
+  Future<bool> updateRecipe(String name, String directions, String image) {
     _isLoading = true;
     notifyListeners();
 
     final Map<String, dynamic> updateData = {
-      'title': title,
-      'description': description,
-      'image':
+      'Id': selectedRecipe.id,
+      'Name': name,
+      'Directions': directions,
+      'Image':
           'http://as01.epimg.net/deporteyvida/imagenes/2018/05/07/portada/1525714597_852564_1525714718_noticia_normal.jpg',
-      'price': price,
-      'userEmail': selectedRecipe.userEmail,
-      'userId': selectedRecipe.userId
     };
 
     return http
-        .put(
-            'https://app-de-nutricion.firebaseio.com/recipes/${selectedRecipe.id}.json?auth=${_authenticatedUser.token}',
+        .put('http://astradev-001-site10.ftempurl.com/api/Recipes/UpdateRecipe',
             body: json.encode(updateData))
         .then((http.Response response) {
       Recipe updatedRecipe = Recipe(
           id: selectedRecipe.id,
-          title: title,
-          description: description,
+          name: name,
+          directions: directions,
           image: image,
-          price: price,
-          userEmail: selectedRecipe.userEmail,
-          userId: selectedRecipe.userId,
           ingredients: selectedRecipe.ingredients);
       _recipes[getSelectedRecipeIndex] = updatedRecipe;
       _isLoading = false;
@@ -215,13 +150,14 @@ class RecipesModel extends ConnectedRecipesModel {
 
   Future<bool> deleteRecipe() {
     _isLoading = true;
-    final String deletedRecipeId = selectedRecipe.id;
+    final int deletedRecipeId = selectedRecipe.id;
     _recipes.removeAt(getSelectedRecipeIndex);
     _selectedRecipeId = null;
     notifyListeners();
+
     return http
         .delete(
-            'https://app-de-nutricion.firebaseio.com/recipes/$deletedRecipeId.json?auth=${_authenticatedUser.token}')
+            'http://astradev-001-site10.ftempurl.com/api/Recipes/UpdateRecipe?Id=$deletedRecipeId')
         .then((http.Response response) {
       _isLoading = false;
       notifyListeners();
@@ -233,18 +169,18 @@ class RecipesModel extends ConnectedRecipesModel {
     });
   }
 
-  void setSelectedRecipe(String recipeId) {
+  void setSelectedRecipe(int recipeId) {
     _selectedRecipeId = recipeId;
     if (recipeId != null) {
       notifyListeners();
     }
   }
 
-  List<Ingredient> fetchIngredientsByIds(Map<String, dynamic> ingredientsMap) {
+  List<Ingredient> fetchIngredientsByIds(List<int> ingredientsIds) {
     List<Ingredient> ingredients = new List<Ingredient>();
 
-    ingredientsMap.forEach(
-      (String ingredientId, dynamic boleano) {
+    ingredientsIds.forEach(
+      (int ingredientId) {
         ingredients.add(_ingredients.firstWhere(
           (Ingredient ingredient) {
             return ingredient.id == ingredientId;
@@ -252,11 +188,52 @@ class RecipesModel extends ConnectedRecipesModel {
         ));
       },
     );
-
     return ingredients;
   }
 
-  Future<bool> fetchRecipes({bool onlyForUser = false}) async {
+  Future<bool> fetchIngredients() {
+    _isLoading = true;
+    notifyListeners();
+
+    return http
+        .get(
+            'http://astradev-001-site10.ftempurl.com/api/Ingredients/GetIngredients')
+        .then((http.Response response) {
+      final List<Ingredient> fetchedIngredientList = [];
+      final List<dynamic> ingredientListData = json.decode(response.body);
+      if (ingredientListData != null) {
+        ingredientListData.forEach((dynamic ingredientData) {
+          ingredientData['Image'] = ingredientData['Image'] == null
+              ? 'https://i.blogs.es/36938e/istock-840527124/450_1000.jpg'
+              : ingredientData['Image'];
+
+          final Ingredient ingredient = Ingredient(
+              id: ingredientData['Id'],
+              name: ingredientData['Name'],
+              description: ingredientData['Description'],
+              image: ingredientData['Image'],
+              quantity: ingredientData['Quantity'],
+              calories: ingredientData['Calories'],
+
+              isFavorite: ingredientData['WishlistUsers'] != null
+                  ? (ingredientData['WishlistUsers'])
+                      .contains(_authenticatedUser.id)
+                  : false);
+          fetchedIngredientList.add(ingredient);
+        });
+        _ingredients = fetchedIngredientList;
+      }
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
+  }
+
+  Future<bool> fetchRecipes() async {
     _isLoading = true;
     notifyListeners();
 
@@ -264,47 +241,43 @@ class RecipesModel extends ConnectedRecipesModel {
     await fetchIngredients();
 
     return http
-        .get(
-            'https://app-de-nutricion.firebaseio.com/recipes.json?auth=${_authenticatedUser.token}')
+        .get('http://astradev-001-site10.ftempurl.com/api/Recipes/GetRecipes')
         .then((http.Response response) {
       final List<Recipe> fetchedRecipeList = [];
-      final Map<String, dynamic> recipeListData = json.decode(response.body);
+      final List<dynamic> recipeListData = json.decode(response.body);
       if (recipeListData != null) {
-        recipeListData.forEach((String recipeId, dynamic recipeData) {
+        recipeListData.forEach((dynamic recipeData) {
+          recipeData['Image'] = recipeData['image'] == null
+              ? 'https://i.blogs.es/36938e/istock-840527124/450_1000.jpg'
+              : recipeData['image'];
+
           final Recipe recipe = Recipe(
-              id: recipeId,
-              title: recipeData['title'],
-              description: recipeData['description'],
-              image: recipeData['image'],
-              price: recipeData['price'],
-              userEmail: recipeData['userEmail'],
-              userId: recipeData['userId'],
-              isFavorite: recipeData['wishlistUsers'] != null
-                  ? (recipeData['wishlistUsers'] as Map<String, dynamic>)
-                      .containsKey(_authenticatedUser.id)
-                  : false,
-              ingredients: recipeData['ingredients'] != null
-                  ? fetchIngredientsByIds(
-                      recipeData['ingredients'] as Map<String, dynamic>)
-                  : new List<Ingredient>());
+            id: recipeData['Id'],
+            name: recipeData['Name'],
+            directions: recipeData['Directions'],
+            image: recipeData['Image'],
+            isFavorite: recipeData['WishlistUsers'] != null
+                ? (recipeData['WishlistUsers']).contains(_authenticatedUser.id)
+                : false,
+            ingredients: recipeData['Ingredients'] != null
+                ? fetchIngredientsByIds(recipeData['Ingredients'].cast<int>())
+                : new List<Ingredient>(),
+          );
+          fetchedRecipeList.add(recipe);
 
           // //Adding manually first ingredient
           // if (recipe.ingredients.length == 0) {
           //   addIngredientToRecipe(recipe, _ingredients[0]);
           // }
-
-          fetchedRecipeList.add(recipe);
         });
-        _recipes = onlyForUser
-            ? fetchedRecipeList.where((Recipe recipe) {
-                return recipe.userId == _authenticatedUser.id;
-              }).toList()
-            : fetchedRecipeList;
+
+        _recipes = fetchedRecipeList;
       }
       _isLoading = false;
       notifyListeners();
       return true;
     }).catchError((error) {
+      print(error.toString());
       _isLoading = false;
       notifyListeners();
       return false;
@@ -317,25 +290,23 @@ class RecipesModel extends ConnectedRecipesModel {
 
     _recipes[getSelectedRecipeIndex] = Recipe(
         id: selectedRecipe.id,
-        description: selectedRecipe.description,
+        directions: selectedRecipe.directions,
         image: selectedRecipe.image,
-        price: selectedRecipe.price,
-        title: selectedRecipe.title,
-        userEmail: selectedRecipe.userEmail,
-        userId: selectedRecipe.userId,
+        name: selectedRecipe.name,
         isFavorite: newFavoriteStatus,
         ingredients: selectedRecipe.ingredients);
 
     // _isLoading = true;
     // notifyListeners();
+
     http.Response response;
     if (newFavoriteStatus) {
       response = await http.put(
-          'https://app-de-nutricion.firebaseio.com/recipes/${selectedRecipe.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+          'http://astradev-001-site10.ftempurl.com/api/Recipes/AddRecipeToUserWishlist?RecipeId=${selectedRecipe.id}&UserId=${_authenticatedUser.id}',
           body: json.encode(true));
     } else {
       response = await http.delete(
-          'https://app-de-nutricion.firebaseio.com/recipes/${selectedRecipe.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
+          'http://astradev-001-site10.ftempurl.com/api/Recipes/DeleteRecipeFromUserWishlist?RecipeId=${selectedRecipe.id}&UserId=${_authenticatedUser.id}');
     }
 
     if (response.statusCode != 200 && response.statusCode != 201) {
@@ -343,12 +314,9 @@ class RecipesModel extends ConnectedRecipesModel {
       // notifyListeners();
       _recipes[getSelectedRecipeIndex] = Recipe(
           id: selectedRecipe.id,
-          description: selectedRecipe.description,
+          directions: selectedRecipe.directions,
           image: selectedRecipe.image,
-          price: selectedRecipe.price,
-          title: selectedRecipe.title,
-          userEmail: selectedRecipe.userEmail,
-          userId: selectedRecipe.userId,
+          name: selectedRecipe.name,
           isFavorite: !newFavoriteStatus,
           ingredients: selectedRecipe.ingredients);
       return false;
@@ -368,24 +336,26 @@ class RecipesModel extends ConnectedRecipesModel {
 ////////////////////////////////////////CONNECTED INGREDIENTS MODEL////////////////////////////////////////////
 
 class ConnectedIngredientsModel extends ConnectedRecipesModel {
-  String _selectedIngredientId;
+  int _selectedIngredientId;
 
   Future<bool> addIngredient(
-      String title, String description, String image) async {
+      String name, String description, String image) async {
+    String quantity = '50 gramos';
+    double calories = 0.0;
+
     _isLoading = true;
     notifyListeners();
 
     final Map<String, dynamic> ingredientData = {
-      'title': title,
-      'description': description,
-      'image':
+      'Name': name,
+      'Description': description,
+      'Quantity': quantity,
+      'Image':
           'https://media.phillyvoice.com/media/images/food-eggs.2e16d0ba.fill-735x490.jpg',
-      'userEmail': _authenticatedUser.email,
-      'userId': _authenticatedUser.id
     };
     try {
       final http.Response response = await http.post(
-          'https://app-de-nutricion.firebaseio.com/ingredients.json?auth=${_authenticatedUser.token}',
+          'http://astradev-001-site10.ftempurl.com/api/Ingredients/AddIngredient',
           body: json.encode(ingredientData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -395,14 +365,19 @@ class ConnectedIngredientsModel extends ConnectedRecipesModel {
       }
 
       final Map<String, dynamic> responseData = json.decode(response.body);
-      Ingredient newIngredient = Ingredient(
-          id: responseData['name'],
-          title: title,
-          description: description,
-          image: image,
-          userEmail: _authenticatedUser.email,
-          userId: _authenticatedUser.id);
-      _ingredients.add(newIngredient);
+
+      if (responseData['Id'] != 0) {
+        Ingredient newIngredient = Ingredient(
+            id: responseData['Id'],
+            quantity: quantity,
+            name: name,
+            description: description,
+            image: image,
+            calories: calories
+            );
+        _ingredients.add(newIngredient);
+      }
+
       _isLoading = false;
       notifyListeners();
       return true;
@@ -435,7 +410,7 @@ class IngredientsModel extends ConnectedIngredientsModel {
     return _showIngredientsFavorites;
   }
 
-  String get getSelectedIngredientId {
+  int get getSelectedIngredientId {
     return _selectedIngredientId;
   }
 
@@ -452,32 +427,33 @@ class IngredientsModel extends ConnectedIngredientsModel {
     });
   }
 
-  Future<bool> updateIngredient(
-      String title, String description, String image) {
+  Future<bool> updateIngredient(String name, String description, String image) {
+    String quantity = '50 gramos';
+    double calories = 0.0;
+
     _isLoading = true;
     notifyListeners();
 
     final Map<String, dynamic> updateData = {
-      'title': title,
-      'description': description,
-      'image':
-          'https://media.phillyvoice.com/media/images/food-eggs.2e16d0ba.fill-735x490.jpg',
-      'userEmail': selectedIngredient.userEmail,
-      'userId': selectedIngredient.userId
+      'Id': selectedIngredient.id,
+      'Name': name,
+      'Description': description,
+      'Quantity': quantity,
+      'Image': image,
     };
 
     return http
         .put(
-            'https://app-de-nutricion.firebaseio.com/ingredients/${selectedIngredient.id}.json?auth=${_authenticatedUser.token}',
+            'http://astradev-001-site10.ftempurl.com/api/Ingredients/UpdateIngredient',
             body: json.encode(updateData))
         .then((http.Response response) {
       Ingredient updatedIngredient = Ingredient(
           id: selectedIngredient.id,
-          title: title,
+          name: name,
           description: description,
+          quantity: quantity,
           image: image,
-          userEmail: selectedIngredient.userEmail,
-          userId: selectedIngredient.userId);
+          calories: calories);
       _ingredients[getSelectedIngredientIndex] = updatedIngredient;
       _isLoading = false;
       notifyListeners();
@@ -491,13 +467,13 @@ class IngredientsModel extends ConnectedIngredientsModel {
 
   Future<bool> deleteIngredient() {
     _isLoading = true;
-    final String deletedIngredientId = selectedIngredient.id;
+    final int deletedIngredientId = selectedIngredient.id;
     _ingredients.removeAt(getSelectedIngredientIndex);
     _selectedIngredientId = null;
     notifyListeners();
     return http
         .delete(
-            'https://app-de-nutricion.firebaseio.com/ingredients/$deletedIngredientId.json?auth=${_authenticatedUser.token}')
+            'http://astradev-001-site10.ftempurl.com/api/Ingredients/DeleteIngredient?Id=$deletedIngredientId')
         .then((http.Response response) {
       _isLoading = false;
       notifyListeners();
@@ -509,7 +485,7 @@ class IngredientsModel extends ConnectedIngredientsModel {
     });
   }
 
-  void setSelectedIngredient(String ingredientId) {
+  void setSelectedIngredient(int ingredientId) {
     _selectedIngredientId = ingredientId;
     if (ingredientId != null) {
       notifyListeners();
@@ -523,10 +499,10 @@ class IngredientsModel extends ConnectedIngredientsModel {
     _ingredients[getSelectedIngredientIndex] = Ingredient(
         id: selectedIngredient.id,
         description: selectedIngredient.description,
+        quantity: selectedIngredient.quantity,
         image: selectedIngredient.image,
-        title: selectedIngredient.title,
-        userEmail: selectedIngredient.userEmail,
-        userId: selectedIngredient.userId,
+        name: selectedIngredient.name,
+        calories: selectedIngredient.calories,
         isFavorite: newFavoriteStatus);
 
     // _isLoading = true;
@@ -534,11 +510,11 @@ class IngredientsModel extends ConnectedIngredientsModel {
     http.Response response;
     if (newFavoriteStatus) {
       response = await http.put(
-          'https://app-de-nutricion.firebaseio.com/ingredients/${selectedIngredient.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+          'http://astradev-001-site10.ftempurl.com/api/Ingredients/AddIngredientToUserWishlist?IngredientId=${selectedIngredient.id}&UserId=${_authenticatedUser.id}',
           body: json.encode(true));
     } else {
       response = await http.delete(
-          'https://app-de-nutricion.firebaseio.com/ingredients/${selectedIngredient.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
+          'http://astradev-001-site10.ftempurl.com/api/Ingredients/DeleteIngredientFromUserWishlist?IngredientId=${selectedIngredient.id}&UserId=${_authenticatedUser.id}');
     }
 
     if (response.statusCode != 200 && response.statusCode != 201) {
@@ -547,10 +523,10 @@ class IngredientsModel extends ConnectedIngredientsModel {
       _ingredients[getSelectedIngredientIndex] = Ingredient(
           id: selectedIngredient.id,
           description: selectedIngredient.description,
+          quantity: selectedIngredient.quantity,
           image: selectedIngredient.image,
-          title: selectedIngredient.title,
-          userEmail: selectedIngredient.userEmail,
-          userId: selectedIngredient.userId,
+          name: selectedIngredient.name,
+          calories: selectedIngredient.calories,
           isFavorite: !newFavoriteStatus);
       return false;
     }
@@ -583,16 +559,16 @@ class UserModel extends ConnectedRecipesModel {
   Future<Map<String, dynamic>> authenticate(
       String email, String password, AuthMode _authMode) async {
     String postUrl = _authMode == AuthMode.Login
-        ? 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyCq1CN_FVBqhum73c_sMGuItfzPuLEGLVE'
-        : 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyCq1CN_FVBqhum73c_sMGuItfzPuLEGLVE';
+        ? 'http://astradev-001-site10.ftempurl.com/api/Users/VerifyPassword'
+        : 'http://astradev-001-site10.ftempurl.com/api/Users/SignupNewUser';
 
     _isLoading = true;
     notifyListeners();
 
     final Map<String, dynamic> authData = {
-      'email': email,
-      'password': password,
-      'returnSecureToken': true
+      'Email': email,
+      'Password': password,
+      'ReturnSecureToken': true
     };
 
     final http.Response response = await http.post(postUrl,
@@ -602,28 +578,26 @@ class UserModel extends ConnectedRecipesModel {
     bool success = false;
     String message = 'Something went wrong';
     final Map<String, dynamic> responseData = jsonDecode(response.body);
-    if (responseData.containsKey('idToken')) {
+    if (responseData.containsKey('Token')) {
       message = 'Authentication succeeded!';
       success = true;
       _authenticatedUser = User(
-          email: email,
-          id: responseData['localId'],
-          token: responseData['idToken']);
+          email: email, id: responseData['Id'], token: responseData['Token']);
       _userSubject.add(true);
-      setAuthTimeout(int.parse(responseData['expiresIn']));
+      setAuthTimeout(responseData['ExpiresIn']);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('token', responseData['idToken']);
+      prefs.setString('token', responseData['Token']);
       prefs.setString('userEmail', email);
-      prefs.setString('userId', responseData['localId']);
+      prefs.setString('userId', responseData['Id']);
       final DateTime now = DateTime.now();
       final DateTime expiryTime =
-          now.add(Duration(seconds: int.parse(responseData['expiresIn'])));
+          now.add(Duration(seconds: responseData['ExpiresIn']));
       prefs.setString('expiryTime', expiryTime.toIso8601String());
-    } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
+    } else if (responseData['Error'] == 'EMAIL_EXISTS') {
       message = 'This email already exists';
-    } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
+    } else if (responseData['Error'] == 'EMAIL_NOT_FOUND') {
       message = 'The email was not found';
-    } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
+    } else if (responseData['Error'] == 'INVALID_PASSWORD') {
       message = 'Invalid Password';
     }
 
@@ -644,7 +618,7 @@ class UserModel extends ConnectedRecipesModel {
         _authenticatedUser = null;
       } else {
         final String userEmail = prefs.getString('userEmail');
-        final String userId = prefs.getString('userId');
+        final int userId = int.parse(prefs.getString('userId'));
         _authenticatedUser = User(
           email: userEmail,
           id: userId,
@@ -683,7 +657,6 @@ class DatesModel extends ConnectedRecipesModel {
   void calculateDays() {
     var now = new DateTime.now();
     for (int i = 0; i < 7; i++) {
-
       List<Food> foodsOfDay = new List<Food>();
       Food food = new Food(recipe: _recipes[0], timeToEat: "Desayuno");
       foodsOfDay.add(food);

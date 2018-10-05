@@ -26,7 +26,7 @@ class ImageCard extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 15.0),
         child: Text(
-          recipe.title,
+          recipe.name,
           textAlign: TextAlign.center,
           style: new TextStyle(
             color: Colors.white,

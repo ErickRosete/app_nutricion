@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
 class Ingredient {
-  final String id;
-  final String title;
+  final int id;
+  final String name;
   final String description;
   final String image;
+  final String quantity;
+  final double calories;
   final bool isFavorite;
-  final String userEmail;
-  final String userId;
 
   Ingredient(
       {@required this.id,
-      @required this.title,
+      @required this.name,
       @required this.description,
       @required this.image,
-      this.isFavorite = false,
-      @required this.userEmail,
-      @required this.userId});
+      @required this.quantity,
+      @required this.calories,
+      this.isFavorite = false});
 }

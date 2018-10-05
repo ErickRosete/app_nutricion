@@ -20,7 +20,7 @@ class _IngredientListPageState extends State<IngredientListPage> {
   @override
   initState() {
     super.initState();
-    widget.model.fetchIngredients(onlyForUser: true);
+    widget.model.fetchIngredients();
   }
 
   Widget _buildEditButton(BuildContext context, int index, MainModel model) {
@@ -49,7 +49,7 @@ class _IngredientListPageState extends State<IngredientListPage> {
           itemBuilder: (BuildContext context, int index) {
             final Ingredient ingredient = model.getIngredients[index];
             return Dismissible(
-              key: Key(ingredient.title),
+              key: Key(ingredient.name),
               onDismissed: (DismissDirection direction) {
                 if (direction == DismissDirection.endToStart ||
                     direction == DismissDirection.startToEnd) {
@@ -64,7 +64,7 @@ class _IngredientListPageState extends State<IngredientListPage> {
                     leading: CircleAvatar(
                       backgroundImage: NetworkImage(ingredient.image),
                     ),
-                    title: Text(ingredient.title),
+                    title: Text(ingredient.name),
                     trailing: _buildEditButton(context, index, model),
                   ),
                   Divider(),

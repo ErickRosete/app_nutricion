@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import './price_tag.dart';
 // import './address_tag.dart';
+import '../ui_elements/calorie_tag.dart';
 import '../ui_elements/title_default.dart';
 import '../ui_elements/image_with_placeholder.dart';
 import '../../models/recipe.dart';
@@ -14,35 +14,21 @@ class RecipeCard extends StatelessWidget {
 
   RecipeCard(this.recipe, this.recipeIndex);
 
-  Widget _buildTitlePriceRow(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-
-    if (size.width > 320) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          TitleDefault(recipe.title),
-          SizedBox(
-            width: 8.0,
-          ),
-          PriceTag(recipe.price.toString()),
-        ],
-      );
-    } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          TitleDefault(recipe.title),
-          SizedBox(
-            width: 8.0,
-          ),
-          PriceTag(recipe.price.toString()),
-          SizedBox(
-            width: 15.0,
-          ),
-        ],
-      );
-    }
+  Widget _buildTitleCaloriesRow(BuildContext context) {
+    double calories = 0.0;
+//          recipe.ingredients.forEach((ing) => calories += ing.calories);
+    return Container (
+      width: MediaQuery.of(context).size.width * .45,
+      child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        CalorieTag(calories.toString()),
+        TitleDefault(recipe.name),
+        SizedBox(
+          width: 8.0,
+        ),
+      ],
+    ),);
   }
 
   Widget _buildActionButtons(BuildContext context, MainModel model) {
@@ -68,8 +54,8 @@ class RecipeCard extends StatelessWidget {
       builder: (BuildContext context, Widget child, MainModel model) {
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed<bool>(
-                context, "/Recipe/" + model.getRecipes[recipeIndex].id);
+            Navigator.pushNamed<bool>(context,
+                "/Recipe/" + model.getRecipes[recipeIndex].id.toString());
           },
           child: Card(
             child: SingleChildScrollView(
@@ -78,7 +64,7 @@ class RecipeCard extends StatelessWidget {
                   ImageWithPlaceholder(recipe.image),
                   Container(
                     margin: EdgeInsets.only(top: 10.0),
-                    child: _buildTitlePriceRow(context),
+                    child: _buildTitleCaloriesRow(context),
                   ),
                   // AddressTag('Union Square, San Francisco'),
                   _buildActionButtons(context, model),

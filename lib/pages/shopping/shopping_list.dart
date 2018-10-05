@@ -79,7 +79,7 @@ class ShoppingListPage extends StatelessWidget {
                           model.toggleBoughtStatus();
                           model.setSelectedShopItem(null);
                         },
-                        title: Text(model.getShopItems[index].ingredient.title),
+                        title: Text(model.getShopItems[index].ingredient.name),
                       ),
                       Divider(),
                     ],

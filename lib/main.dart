@@ -93,7 +93,7 @@ class _MyAppState extends State<MyApp> {
           }
 
           if (pathElements[1] == 'Recipe') {
-            final String recipeId = pathElements[2];
+            final int recipeId = int.parse(pathElements[2]);
             final Recipe recipe = _model.getRecipes.firstWhere((Recipe recipe) {
               return recipe.id == recipeId;
             });
@@ -115,7 +115,7 @@ class _MyAppState extends State<MyApp> {
           }
 
           if (pathElements[1] == 'Ingredient') {
-            final String ingredientId = pathElements[2];
+            final int ingredientId = int.parse(pathElements[2]);
             final Ingredient ingredient =
                 _model.getIngredients.firstWhere((Ingredient ingredient) {
               return ingredient.id == ingredientId;

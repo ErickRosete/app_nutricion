@@ -20,7 +20,7 @@ class _RecipeListPageState extends State<RecipeListPage> {
   @override
   initState() {
     super.initState();
-    widget.model.fetchRecipes(onlyForUser: true);
+    widget.model.fetchRecipes();
   }
 
   Widget _buildEditButton(BuildContext context, int index, MainModel model) {
@@ -48,8 +48,11 @@ class _RecipeListPageState extends State<RecipeListPage> {
         return ListView.builder(
           itemBuilder: (BuildContext context, int index) {
             final Recipe recipe = model.getRecipes[index];
+            double calories = 0.0;
+//          recipe.ingredients.forEach((ing) => calories += ing.calories);
+
             return Dismissible(
-              key: Key(recipe.title),
+              key: Key(recipe.name),
               onDismissed: (DismissDirection direction) {
                 if (direction == DismissDirection.endToStart ||
                     direction == DismissDirection.startToEnd) {
@@ -64,8 +67,8 @@ class _RecipeListPageState extends State<RecipeListPage> {
                     leading: CircleAvatar(
                       backgroundImage: NetworkImage(recipe.image),
                     ),
-                    title: Text(recipe.title),
-                    subtitle: Text('\$${recipe.price}'),
+                    title: Text(recipe.name),
+                    subtitle: Text('$calories cal'),
                     trailing: _buildEditButton(context, index, model),
                   ),
                   Divider(),

@@ -11,6 +11,8 @@ class RecipePage extends StatelessWidget {
   RecipePage(this.recipe);
 
   Widget _buildAddressPriceRow(Recipe recipe) {
+    double calories = 0.0;
+//          recipe.ingredients.forEach((ing) => calories += ing.calories);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -22,7 +24,7 @@ class RecipePage extends StatelessWidget {
           ),
         ),
         Text(
-          '\$${recipe.price.toString()}',
+          '$calories cal',
           style: TextStyle(
             color: Colors.grey,
             fontFamily: 'Oswald',
@@ -41,20 +43,20 @@ class RecipePage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(recipe.title),
+          title: Text(recipe.name),
         ),
         // body: RecipeManager(startingRecipe:'Food Tester')
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
               ImageWithPlaceholder(recipe.image),
-              TitleDefault(recipe.title),
+              TitleDefault(recipe.name),
               SizedBox(height: 10.0),
               _buildAddressPriceRow(recipe),
               Container(
                 margin: EdgeInsets.all(10.0),
                 child: Text(
-                  recipe.description,
+                  recipe.directions,
                   style: TextStyle(
                     color: Colors.grey,
                   ),
@@ -64,7 +66,7 @@ class RecipePage extends StatelessWidget {
               RaisedButton(
                 onPressed: () {
                   Navigator.pushNamed<bool>(
-                      context, "/Recipe/" + recipe.id + "/Ingredients");
+                      context, "/Recipe/" + recipe.id.toString() + "/Ingredients");
                 },
                 child: Text("View Ingredients"),
               ),

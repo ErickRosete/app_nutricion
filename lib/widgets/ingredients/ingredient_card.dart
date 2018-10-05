@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../ui_elements/title_default.dart';
+import '../ui_elements/calorie_tag.dart';
 import '../ui_elements/image_with_placeholder.dart';
 import '../../models/ingredient.dart';
 import '../../scoped-models/main.dart';
@@ -12,15 +13,19 @@ class IngredientCard extends StatelessWidget {
 
   IngredientCard(this.ingredient, this.ingredientIndex);
 
-  Widget _buildTitlePriceRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        TitleDefault(ingredient.title),
-        SizedBox(
-          width: 8.0,
-        ),
-      ],
+  Widget _buildTitlePriceRow(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * .45,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          CalorieTag(ingredient.calories.toString()),
+          TitleDefault(ingredient.name),
+          SizedBox(
+            width: 8.0,
+          ),
+        ],
+      ),
     );
   }
 
@@ -51,8 +56,10 @@ class IngredientCard extends StatelessWidget {
       builder: (BuildContext context, Widget child, MainModel model) {
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed<bool>(context,
-                "/Ingredient/" + model.getIngredients[ingredientIndex].id);
+            Navigator.pushNamed<bool>(
+                context,
+                "/Ingredient/" +
+                    model.getIngredients[ingredientIndex].id.toString());
           },
           child: Card(
             child: SingleChildScrollView(
@@ -61,7 +68,7 @@ class IngredientCard extends StatelessWidget {
                   ImageWithPlaceholder(ingredient.image),
                   Container(
                     margin: EdgeInsets.only(top: 10.0),
-                    child: _buildTitlePriceRow(),
+                    child: _buildTitlePriceRow(context),
                   ),
                   _buildActionButtons(context),
                 ],

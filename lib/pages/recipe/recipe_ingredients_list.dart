@@ -51,7 +51,7 @@ class RecipeIngredientsListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(recipe.title + " - Ingredients"),
+          title: Text(recipe.name + " - Ingredients"),
         ),
         // body: RecipeManager(startingRecipe:'Food Tester')
         body: _buildIngredientList(context, recipe.ingredients));

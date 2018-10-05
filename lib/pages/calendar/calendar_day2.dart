@@ -30,7 +30,7 @@ class CalendarDayPage extends StatelessWidget {
           },
           itemBuilder: (BuildContext context, int index) {
             return new Text(
-              model.getSelectedDate.foods[index].recipe.title,
+              model.getSelectedDate.foods[index].recipe.name,
               style: Theme.of(context).textTheme.headline,
             );
           },

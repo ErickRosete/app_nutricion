@@ -25,7 +25,7 @@ class _IngredientFormPageState extends State<IngredientFormPage> {
 
   Widget _buildTitleTextField(Ingredient ingredient) {
     return TextFormField(
-      initialValue: ingredient == null ? '' : ingredient.title,
+      initialValue: ingredient == null ? '' : ingredient.name,
       decoration: InputDecoration(labelText: 'Ingredient Title'),
       validator: (String value) {
         if (value.isEmpty || value.length < 5) {

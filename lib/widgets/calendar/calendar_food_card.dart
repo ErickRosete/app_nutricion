@@ -48,7 +48,7 @@ class CalendarFoodCard extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed<bool>(context, "/Recipe/" + food.recipe.id);
+            Navigator.pushNamed<bool>(context, "/Recipe/" + food.recipe.id.toString());
           },
           child: Card(
             color: color,
@@ -87,7 +87,7 @@ class CalendarFoodCard extends StatelessWidget {
                         Container(
                           margin: EdgeInsets.all(5.0),
                           child: Text(
-                            food.recipe.title,
+                            food.recipe.name,
                             style: TextStyle(fontSize: 22.0),
                           ),
                         ),

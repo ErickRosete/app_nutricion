@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class PriceTag extends StatelessWidget {
-  final String price;
+class CalorieTag extends StatelessWidget {
+  final String calories;
 
-  PriceTag(this.price);
+  CalorieTag(this.calories);
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class PriceTag extends StatelessWidget {
           color: Theme.of(context).accentColor,
           borderRadius: BorderRadius.circular(5.0)),
       child: Text(
-        '\$' + price,
+        '$calories cal',
         style: TextStyle(
           color: Colors.white,
         ),
