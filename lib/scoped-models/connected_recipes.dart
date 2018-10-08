@@ -432,6 +432,13 @@ class IngredientsModel extends ConnectedIngredientsModel {
     });
   }
 
+  Ingredient getIngredientById (int id) {
+    if (id == null) return null;
+    return _ingredients.firstWhere((Ingredient ingredient) {
+      return ingredient.id == id;
+    }, orElse: null);
+  }
+
   Future<bool> updateIngredient(String name, String description, String image) {
     String quantity = '50 gramos';
     double calories = 0.0;

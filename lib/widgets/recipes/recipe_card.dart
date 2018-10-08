@@ -31,22 +31,6 @@ class RecipeCard extends StatelessWidget {
     ),);
   }
 
-  Widget _buildActionButtons(BuildContext context, MainModel model) {
-    return !model.displayRecipesFavoritesOnly
-        ? IconButton(
-            icon: Icon(model.getRecipes[recipeIndex].isFavorite
-                ? Icons.favorite
-                : Icons.favorite_border),
-            color: Colors.red,
-            onPressed: () {
-              model.setSelectedRecipe(model.getRecipes[recipeIndex].id);
-              model.toggleRecipeFavoriteStatus();
-              model.setSelectedRecipe(null);
-            },
-          )
-        : Container();
-  }
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -67,7 +51,6 @@ class RecipeCard extends StatelessWidget {
                     child: _buildTitleCaloriesRow(context),
                   ),
                   // AddressTag('Union Square, San Francisco'),
-                  _buildActionButtons(context, model),
                 ],
               ),
             ),

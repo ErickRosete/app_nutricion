@@ -29,26 +29,6 @@ class IngredientCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
-    return ScopedModelDescendant<MainModel>(
-      builder: (BuildContext context, Widget child, MainModel model) {
-        return IconButton(
-          icon: Icon(model.getIngredients[ingredientIndex].isFavorite ||
-                  model.displayIngredientsFavoritesOnly
-              ? Icons.favorite
-              : Icons.favorite_border),
-          color: Colors.red,
-          onPressed: () {
-            model.setSelectedIngredient(
-                model.getIngredients[ingredientIndex].id);
-            model.toggleIngredientFavoriteStatus();
-            model.setSelectedIngredient(null);
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -70,7 +50,6 @@ class IngredientCard extends StatelessWidget {
                     margin: EdgeInsets.only(top: 10.0),
                     child: _buildTitlePriceRow(context),
                   ),
-                  _buildActionButtons(context),
                 ],
               ),
             ),

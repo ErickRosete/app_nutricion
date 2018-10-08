@@ -16,7 +16,7 @@ class Recipes extends StatelessWidget {
           return GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: orientation == Orientation.portrait ? 2 : 3,
-              childAspectRatio: displayRecipesFavoritesOnly? 1.1 : .65,
+              childAspectRatio: .8,
             ),
             itemBuilder: (BuildContext context, int index) =>
                 RecipeCard(recipes[index], index),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:scoped_model/scoped_model.dart';
 
 import '../../widgets/ui_elements/title_default.dart';
 import '../../widgets/ui_elements/image_with_placeholder.dart';
 import '../../models/recipe.dart';
+import '../../scoped-models/main.dart';
 
 class RecipePage extends StatelessWidget {
   final Recipe recipe;
@@ -44,6 +46,23 @@ class RecipePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(recipe.name),
+          actions: <Widget>[
+            ScopedModelDescendant<MainModel>(
+              builder: (BuildContext context, Widget child, MainModel model) {
+                return IconButton(
+                  icon: Icon(model.getRecipeById(recipe.id).isFavorite
+                      ? Icons.favorite
+                      : Icons.favorite_border),
+                  color: Colors.red,
+                  onPressed: () {
+                    model.setSelectedRecipe(recipe.id);
+                    model.toggleRecipeFavoriteStatus();
+                    model.setSelectedRecipe(null);
+                  },
+                );
+              },
+            ),
+          ],
         ),
         // body: RecipeManager(startingRecipe:'Food Tester')
         body: SingleChildScrollView(
@@ -65,8 +84,8 @@ class RecipePage extends StatelessWidget {
               ),
               RaisedButton(
                 onPressed: () {
-                  Navigator.pushNamed<bool>(
-                      context, "/Recipe/" + recipe.id.toString() + "/Ingredients");
+                  Navigator.pushNamed<bool>(context,
+                      "/Recipe/" + recipe.id.toString() + "/Ingredients");
                 },
                 child: Text("View Ingredients"),
               ),
