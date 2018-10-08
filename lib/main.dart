@@ -65,7 +65,7 @@ class _MyAppState extends State<MyApp> {
           '/': (BuildContext context) =>
               _isAuthenticated ? RecipesPage(_model) : AuthPage(),
           '/calendar': (BuildContext context) =>
-              _isAuthenticated ? CalendarPage() : AuthPage(),
+              _isAuthenticated ? CalendarPage(_model) : AuthPage(),
           '/calendarDay': (BuildContext context) =>
               _isAuthenticated ? CalendarDayPage() : AuthPage(),
           '/images': (BuildContext context) =>

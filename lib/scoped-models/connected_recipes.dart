@@ -115,6 +115,13 @@ class RecipesModel extends ConnectedRecipesModel {
     });
   }
 
+  Recipe getRecipeById(int id) {
+    if (id == null) return null;
+    return _recipes.firstWhere((Recipe recipe) {
+      return recipe.id == id;
+    }, orElse: null);
+  }
+
   Future<bool> updateRecipe(String name, String directions, String image) {
     _isLoading = true;
     notifyListeners();
@@ -214,7 +221,6 @@ class RecipesModel extends ConnectedRecipesModel {
               image: ingredientData['Image'],
               quantity: ingredientData['Quantity'],
               calories: ingredientData['Calories'],
-
               isFavorite: ingredientData['WishlistUsers'] != null
                   ? (ingredientData['WishlistUsers'])
                       .contains(_authenticatedUser.id)
@@ -373,8 +379,7 @@ class ConnectedIngredientsModel extends ConnectedRecipesModel {
             name: name,
             description: description,
             image: image,
-            calories: calories
-            );
+            calories: calories);
         _ingredients.add(newIngredient);
       }
 
@@ -588,7 +593,7 @@ class UserModel extends ConnectedRecipesModel {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['Token']);
       prefs.setString('userEmail', email);
-      prefs.setString('userId', responseData['Id']);
+      prefs.setString('userId', responseData['Id'].toString());
       final DateTime now = DateTime.now();
       final DateTime expiryTime =
           now.add(Duration(seconds: responseData['ExpiresIn']));
@@ -650,29 +655,47 @@ class UserModel extends ConnectedRecipesModel {
 
 ///////////////////////////////////////////////////////////Date Model/////////////////////////////////////////////////
 
-class DatesModel extends ConnectedRecipesModel {
+class DatesModel extends RecipesModel {
   List<Date> _dates = [];
   int _selectedDate;
 
-  void calculateDays() {
-    var now = new DateTime.now();
-    for (int i = 0; i < 7; i++) {
-      List<Food> foodsOfDay = new List<Food>();
-      Food food = new Food(recipe: _recipes[0], timeToEat: "Desayuno");
-      foodsOfDay.add(food);
-      food = new Food(recipe: _recipes[1], timeToEat: "Merienda-1");
-      foodsOfDay.add(food);
-      food = new Food(recipe: _recipes[2], timeToEat: "Comida");
-      foodsOfDay.add(food);
-      food = new Food(recipe: _recipes[3], timeToEat: "Merienda-2");
-      foodsOfDay.add(food);
-      food = new Food(recipe: _recipes[4], timeToEat: "Cena");
-      foodsOfDay.add(food);
+  Future<bool> fetchDates() {
+    _isLoading = true;
+    notifyListeners();
+    List<Date> fetchedDates = [];
 
-      var dateTimeToAdd = now.add(new Duration(days: i));
-      Date dayToAdd = new Date(dateTime: dateTimeToAdd, foods: foodsOfDay);
-      _dates.add(dayToAdd);
-    }
+    return http
+        .get(
+            'http://astradev-001-site10.ftempurl.com/api/Dates/GetDatesFromUser?id=${_authenticatedUser.id}')
+        .then((http.Response response) {
+      final List<dynamic> calendarData = json.decode(response.body);
+      if (calendarData != null) {
+        calendarData.forEach((dynamic dateData) {
+          final DateTime dateTime = DateTime.parse(dateData['DateTime']);
+          final List<Food> foods = new List<Food>();
+
+          dateData['Foods'].forEach((dynamic foodData) {
+            final Food food = Food(
+              recipe: getRecipeById(foodData['RecipeId']),
+              timeToEat: foodData['TimeToEat'],
+            );
+            foods.add(food);
+          });
+
+          Date date = new Date(dateTime: dateTime, foods: foods);
+          fetchedDates.add(date);
+        });
+        _dates = fetchedDates;
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
   }
 
   List<Date> get getDates {

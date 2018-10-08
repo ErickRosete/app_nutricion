@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:intl/intl.dart';
 
-import '../../models/date.dart';
 import '../../scoped-models/main.dart';
+import '../../widgets/calendar/dates.dart';
 import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
 import '../../widgets/ui_elements/drawer/recipes_list_tile.dart';
 import '../../widgets/ui_elements/drawer/ingredients_list_tile.dart';
@@ -13,7 +12,24 @@ import '../../widgets/ui_elements/drawer/shopping_list_tile.dart';
 import '../../widgets/ui_elements/drawer/images_list_tile.dart';
 import '../../widgets/ui_elements/drawer/videos_list_tile.dart';
 
-class CalendarPage extends StatelessWidget {
+class CalendarPage extends StatefulWidget {
+  final MainModel model;
+
+  CalendarPage(this.model);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _CalendarPageState();
+  }
+}
+
+class _CalendarPageState extends State<CalendarPage> {
+  @override
+  initState() {
+    super.initState();
+    widget.model.fetchDates();
+  }
+
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
       child: SingleChildScrollView(
@@ -46,10 +62,18 @@ class CalendarPage extends StatelessWidget {
     );
   }
 
-  Image _dayImage(DateTime date) {
-    return Image.asset(
-      "assets/icons/" + DateFormat('EEEE').format(date) + ".png",
-      fit: BoxFit.contain,
+  Widget _buildDateList() {
+    return ScopedModelDescendant(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        Widget content = Center(child: Text('No se encontraron fechas'));
+        if (model.getDates.length > 0 && !model.isLoading) {
+          content = Dates();
+        } else if (model.isLoading) {
+          content = Center(child: CircularProgressIndicator());
+        }
+        return RefreshIndicator(
+            onRefresh: model.fetchDates, child: content);
+      },
     );
   }
 
@@ -60,39 +84,12 @@ class CalendarPage extends StatelessWidget {
         Navigator.pushReplacementNamed(context, '/');
       },
       child: Scaffold(
-          drawer: _buildSideDrawer(context),
-          appBar: AppBar(
-            title: Text("Calendar"),
-          ),
-          body: ScopedModelDescendant<MainModel>(
-            builder: (BuildContext context, Widget child, MainModel model) {
-              if (model.getDates.length < 1) model.calculateDays();
-
-              return ListView.builder(
-                itemCount: model.getDates.length,
-                itemBuilder: (context, index) {
-                  final Date date = model.getDates[index];
-                  return Column(
-                    children: <Widget>[
-                      ListTile(
-                        leading: CircleAvatar(
-                          child: _dayImage(date.dateTime),
-                          backgroundColor: Colors.transparent,
-                        ),
-                        title: Text(DateFormat.yMMMMd("es").format(date.dateTime)),
-                        subtitle: Text(DateFormat.EEEE('es').format(date.dateTime)),
-                        onTap: () {
-                          model.setSelectedDate(index);
-                          Navigator.pushNamed(context, '/calendarDay');
-                        },
-                      ),
-                      Divider(),
-                    ],
-                  );
-                },
-              );
-            },
-          )),
+        drawer: _buildSideDrawer(context),
+        appBar: AppBar(
+          title: Text("Calendar"),
+        ),
+        body: _buildDateList(),
+      ),
     );
   }
 }
