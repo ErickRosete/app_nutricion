@@ -25,7 +25,7 @@ dev_dependencies:
     sdk: flutter
 
 flutter_icons:
-  image_path: "assets/placeholder_logo.png"
+  image_path: "assets/logo.jpg"
   android: true
   ios: true
 
@@ -46,6 +46,8 @@ flutter:
     - assets/background.jpg
     - assets/placeholder.png
     - assets/placeholder_logo.png
+    - assets/logo.jpg
+
 
     - assets/icons/Monday.png
     - assets/icons/Tuesday.png

@@ -5,9 +5,11 @@ class Ingredient {
   final String name;
   final String description;
   final String image;
-  final String quantity;
+  final double quantity;
+  final String unit;
   final double calories;
   final bool isFavorite;
+  final String category;
 
   Ingredient(
       {@required this.id,
@@ -15,6 +17,8 @@ class Ingredient {
       @required this.description,
       @required this.image,
       @required this.quantity,
+      @required this.unit,
       @required this.calories,
+      @required this.category,
       this.isFavorite = false});
 }

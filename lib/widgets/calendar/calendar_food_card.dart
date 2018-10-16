@@ -17,85 +17,58 @@ class CalendarFoodCard extends StatelessWidget {
       builder: (BuildContext context, Widget child, MainModel model) {
         bool landscape = MediaQuery.of(context).size.width >=
             MediaQuery.of(context).size.height;
-        MaterialColor color;
-        switch (food.timeToEat.split('-')[0]) {
-          case "Desayuno":
-            {
-              color = Colors.yellow;
-              break;
-            }
-          case "Merienda":
-            {
-              color = Colors.orange;
-              break;
-            }
-          case "Comida":
-            {
-              color = Colors.green;
-              break;
-            }
-          case "Cena":
-            {
-              color = Colors.deepPurple;
-              break;
-            }
-          default:
-            {
-              color = Colors.white;
-              break;
-            }
+        var color = Colors.amber.shade100;
+        if (food.timeToEat.split('-')[0] == 'Merienda') {
+          color = Colors.deepOrange.shade50;
         }
 
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed<bool>(context, "/Recipe/" + food.recipe.id.toString());
+            Navigator.pushNamed<bool>(
+                context, "/Recipe/" + food.recipe.id.toString() + "/${food.timeToEat.split('-')[0]}");
           },
-          child: Card(
-            color: color,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0)),
-            child: Row(
-              children: <Widget>[
-                ImageWithPlaceholder(
-                  food.recipe.image,
-                  height: landscape
-                      ? 100.0
-                      : (MediaQuery.of(context).size.height - 125) / 5,
-                ),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        fit: BoxFit.contain,
-                        colorFilter: ColorFilter.mode(
-                          color.withOpacity(0.3),
-                          BlendMode.dstATop,
-                        ),
-                        image: AssetImage('assets/placeholder_logo.png'),
-                      ),
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.all(5.0),
-                          child: Text(
-                            food.timeToEat.split('-')[0],
-                            style: TextStyle(
-                                fontSize: 26.0, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.all(5.0),
-                          child: Text(
-                            food.recipe.name,
-                            style: TextStyle(fontSize: 22.0),
-                          ),
-                        ),
-                      ],
+          child: Container(
+            margin: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 0.0),
+            child: Card(
+              color: color,
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.all(4.0),
+                    child: ImageWithPlaceholder(
+                      food.recipe.image,
+                      height: landscape
+                          ? 100.0
+                          : (MediaQuery.of(context).size.height - 250) / 5,
                     ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Container(
+                      color: color,
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.all(5.0),
+                            child: Text(
+                              food.timeToEat.split('-')[0],
+                              style: TextStyle(
+                                  fontSize: 26.0, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.all(5.0),
+                            child: Text(
+                              food.recipe.name,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 22.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

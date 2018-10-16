@@ -4,10 +4,13 @@ class ImagesListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(Icons.image),
+      leading: Icon(
+        Icons.image,
+        color: Colors.orange.shade600,
+      ),
       title: Text("Images"),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/images');
+        Navigator.pushNamed(context, '/images');
       },
     );
   }

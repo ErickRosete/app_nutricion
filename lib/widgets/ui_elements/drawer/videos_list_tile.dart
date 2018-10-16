@@ -4,10 +4,13 @@ class VideosListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(Icons.video_library),
+      leading: Icon(
+        Icons.video_library,
+        color: Colors.orange.shade600,
+      ),
       title: Text("Videos"),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/videos');
+        Navigator.pushNamed(context, '/videos');
       },
     );
   }

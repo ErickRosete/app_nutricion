@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import './pages/calendar/today.dart';
 import './pages/calendar/calendar.dart';
 import './pages/calendar/calendar_day.dart';
 import './pages/media/images.dart';
@@ -57,13 +58,14 @@ class _MyAppState extends State<MyApp> {
         title: "Nutrición",
         theme: ThemeData(
           primarySwatch: Colors.green,
+          primaryColor: Color.fromARGB(255, 128, 204, 43),
           buttonColor: Colors.greenAccent,
         ),
 //        home: AuthPage(),
 
         routes: {
           '/': (BuildContext context) =>
-              _isAuthenticated ? RecipesPage(_model) : AuthPage(),
+              _isAuthenticated ? TodayPage(_model) : AuthPage(),
           '/calendar': (BuildContext context) =>
               _isAuthenticated ? CalendarPage(_model) : AuthPage(),
           '/calendarDay': (BuildContext context) =>
@@ -73,7 +75,9 @@ class _MyAppState extends State<MyApp> {
           '/videos': (BuildContext context) =>
               _isAuthenticated ? VideosPage() : AuthPage(),
           '/shoppingList': (BuildContext context) =>
-              _isAuthenticated ? ShoppingListPage() : AuthPage(),
+              _isAuthenticated ? ShoppingListPage(_model) : AuthPage(),
+          '/recipes': (BuildContext context) =>
+              _isAuthenticated ? RecipesPage(_model) : AuthPage(),
           '/ingredients': (BuildContext context) =>
               _isAuthenticated ? IngredientsPage(_model) : AuthPage(),
           '/recipesAdmin': (BuildContext context) =>
@@ -98,17 +102,16 @@ class _MyAppState extends State<MyApp> {
               return recipe.id == recipeId;
             });
 
-            if (pathElements.length < 4) {
-              return MaterialPageRoute<bool>(
-                builder: (BuildContext context) =>
-                    _isAuthenticated ? RecipePage(recipe) : AuthPage(),
-              );
-            }
-
             if (pathElements[3] == "Ingredients") {
               return MaterialPageRoute<bool>(
                 builder: (BuildContext context) => _isAuthenticated
                     ? RecipeIngredientsListPage(recipe)
+                    : AuthPage(),
+              );
+            } else {
+              return MaterialPageRoute<bool>(
+                builder: (BuildContext context) => _isAuthenticated
+                    ? RecipePage(recipe, _model, pathElements[3])
                     : AuthPage(),
               );
             }

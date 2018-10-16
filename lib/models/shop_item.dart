@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
-import './ingredient.dart';
-
 class ShopItem {
-  final Ingredient ingredient;
   final bool bought;
+  final String name;
+  final String quantity;
+  final String image;
 
 
   ShopItem(
-      {@required this.ingredient,
+      {@required this.name,
+      @required this.quantity,
+      @required this.image,
       @required this.bought});
 }

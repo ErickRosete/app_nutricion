@@ -4,10 +4,13 @@ class ShoppingListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(Icons.shopping_cart),
+      leading: Icon(
+        Icons.shopping_cart,
+        color: Colors.orange.shade600,
+      ),
       title: Text("Shopping list"),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/shoppingList');
+        Navigator.pushNamed(context, '/shoppingList');
       },
     );
   }

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/subjects.dart';
 
+import '../models/shop_item.dart';
 import '../models/ingredient.dart';
 import '../models/recipe.dart';
 import '../models/user.dart';
@@ -62,20 +63,6 @@ class ConnectedRecipesModel extends Model {
       notifyListeners();
       return false;
     }
-  }
-
-  Future<bool> addIngredientToRecipe(
-      Recipe recipe, Ingredient ingredient) async {
-    http.Response response = await http.put(
-        'http://astradev-001-site10.ftempurl.com/api/Recipes/AddIngredientToRecipe?IngredientId=${ingredient.id}&RecipeId=${recipe.id}',
-        body: json.encode(true));
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      recipe.ingredients.add(ingredient);
-      return true;
-    }
-
-    return false;
   }
 }
 
@@ -183,16 +170,75 @@ class RecipesModel extends ConnectedRecipesModel {
     }
   }
 
+  Ingredient getIngredientById(int id) {
+    if (id == null) return null;
+    return _ingredients.firstWhere((Ingredient ingredient) {
+      return ingredient.id == id;
+    });
+  }
+
+  double getIngredientQuantity(Ingredient ingredient) {
+    double quantity = 0.0;
+    quantity =
+        ingredient.quantity * _authenticatedUser.modifier[ingredient.category];
+    return quantity;
+  }
+
+  Future<bool> addIngredientToRecipe(
+      Recipe recipe, Ingredient ingredient) async {
+    http.Response response = await http.put(
+        'http://astradev-001-site10.ftempurl.com/api/Recipes/AddIngredientToRecipe?IngredientId=${ingredient.id}&RecipeId=${recipe.id}',
+        body: json.encode(true));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      recipe.ingredients.add(ingredient);
+      return true;
+    }
+    return false;
+  }
+
+  List<Ingredient> getEquivalentIngredients(String category) {
+    return _ingredients
+        .where((Ingredient ingredient) => ingredient.category == category)
+        .toList();
+  }
+
+  Future<List<Ingredient>> getEquivalentIngredientsFromAPI(int id) {
+    _isLoading = true;
+    notifyListeners();
+
+    return http
+        .get(
+            'http://astradev-001-site10.ftempurl.com/api/Ingredients/GetEquivalentIngredients?id=$id')
+        .then((http.Response response) {
+      final List<Ingredient> equivalentIngredients = [];
+      final List<dynamic> ingredientListData = json.decode(response.body);
+      if (ingredientListData != null) {
+        ingredientListData.forEach((dynamic ingredientData) {
+          final Ingredient ingredient = getIngredientById(ingredientData['Id']);
+          equivalentIngredients.add(ingredient);
+        });
+      }
+      _isLoading = false;
+      notifyListeners();
+      return equivalentIngredients;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    });
+  }
+
   List<Ingredient> fetchIngredientsByIds(List<int> ingredientsIds) {
     List<Ingredient> ingredients = new List<Ingredient>();
-
     ingredientsIds.forEach(
       (int ingredientId) {
-        ingredients.add(_ingredients.firstWhere(
+        var ingredient = _ingredients.firstWhere(
           (Ingredient ingredient) {
             return ingredient.id == ingredientId;
           },
-        ));
+        );
+        ingredients.add(ingredient);
       },
     );
     return ingredients;
@@ -201,6 +247,7 @@ class RecipesModel extends ConnectedRecipesModel {
   Future<bool> fetchIngredients() {
     _isLoading = true;
     notifyListeners();
+    print("Fetch Ingredients");
 
     return http
         .get(
@@ -208,6 +255,7 @@ class RecipesModel extends ConnectedRecipesModel {
         .then((http.Response response) {
       final List<Ingredient> fetchedIngredientList = [];
       final List<dynamic> ingredientListData = json.decode(response.body);
+
       if (ingredientListData != null) {
         ingredientListData.forEach((dynamic ingredientData) {
           ingredientData['Image'] = ingredientData['Image'] == null
@@ -221,6 +269,8 @@ class RecipesModel extends ConnectedRecipesModel {
               image: ingredientData['Image'],
               quantity: ingredientData['Quantity'],
               calories: ingredientData['Calories'],
+              unit: ingredientData['Unit'],
+              category: ingredientData["Category"],
               isFavorite: ingredientData['WishlistUsers'] != null
                   ? (ingredientData['WishlistUsers'])
                       .contains(_authenticatedUser.id)
@@ -243,8 +293,7 @@ class RecipesModel extends ConnectedRecipesModel {
     _isLoading = true;
     notifyListeners();
 
-    //Make sure _ingredients have been fetched
-    await fetchIngredients();
+    print("Fetch Recipes");
 
     return http
         .get('http://astradev-001-site10.ftempurl.com/api/Recipes/GetRecipes')
@@ -346,8 +395,10 @@ class ConnectedIngredientsModel extends ConnectedRecipesModel {
 
   Future<bool> addIngredient(
       String name, String description, String image) async {
-    String quantity = '50 gramos';
+    double quantity = 50.0;
+    String unit = "gr";
     double calories = 0.0;
+    String category = "";
 
     _isLoading = true;
     notifyListeners();
@@ -359,6 +410,7 @@ class ConnectedIngredientsModel extends ConnectedRecipesModel {
       'Image':
           'https://media.phillyvoice.com/media/images/food-eggs.2e16d0ba.fill-735x490.jpg',
     };
+
     try {
       final http.Response response = await http.post(
           'http://astradev-001-site10.ftempurl.com/api/Ingredients/AddIngredient',
@@ -376,9 +428,11 @@ class ConnectedIngredientsModel extends ConnectedRecipesModel {
         Ingredient newIngredient = Ingredient(
             id: responseData['Id'],
             quantity: quantity,
+            unit: unit,
             name: name,
             description: description,
             image: image,
+            category: category,
             calories: calories);
         _ingredients.add(newIngredient);
       }
@@ -432,16 +486,11 @@ class IngredientsModel extends ConnectedIngredientsModel {
     });
   }
 
-  Ingredient getIngredientById (int id) {
-    if (id == null) return null;
-    return _ingredients.firstWhere((Ingredient ingredient) {
-      return ingredient.id == id;
-    }, orElse: null);
-  }
-
   Future<bool> updateIngredient(String name, String description, String image) {
-    String quantity = '50 gramos';
+    double quantity = 50.0;
+    String unit = "gr";
     double calories = 0.0;
+    String category = "";
 
     _isLoading = true;
     notifyListeners();
@@ -464,8 +513,10 @@ class IngredientsModel extends ConnectedIngredientsModel {
           name: name,
           description: description,
           quantity: quantity,
+          unit: unit,
           image: image,
-          calories: calories);
+          calories: calories,
+          category: category);
       _ingredients[getSelectedIngredientIndex] = updatedIngredient;
       _isLoading = false;
       notifyListeners();
@@ -512,9 +563,11 @@ class IngredientsModel extends ConnectedIngredientsModel {
         id: selectedIngredient.id,
         description: selectedIngredient.description,
         quantity: selectedIngredient.quantity,
+        unit: selectedIngredient.unit,
         image: selectedIngredient.image,
         name: selectedIngredient.name,
         calories: selectedIngredient.calories,
+        category: selectedIngredient.category,
         isFavorite: newFavoriteStatus);
 
     // _isLoading = true;
@@ -536,9 +589,11 @@ class IngredientsModel extends ConnectedIngredientsModel {
           id: selectedIngredient.id,
           description: selectedIngredient.description,
           quantity: selectedIngredient.quantity,
+          unit: selectedIngredient.unit,
           image: selectedIngredient.image,
           name: selectedIngredient.name,
           calories: selectedIngredient.calories,
+          category: selectedIngredient.category,
           isFavorite: !newFavoriteStatus);
       return false;
     }
@@ -568,6 +623,40 @@ class UserModel extends ConnectedRecipesModel {
     return _userSubject;
   }
 
+  void updateUserModifier() {
+    getModifier(_authenticatedUser.id).then((Map<String, dynamic> modifier) {
+      _authenticatedUser = User(
+        email: _authenticatedUser.email,
+        id: _authenticatedUser.id,
+        token: _authenticatedUser.token,
+        modifier: modifier,
+      );
+    });
+  }
+
+  Future<Map<String, dynamic>> getModifier(int id) {
+    _isLoading = true;
+    notifyListeners();
+    Map<String, dynamic> modifier;
+
+    return http
+        .get(
+            'http://astradev-001-site10.ftempurl.com/api/Users/GetModifier?id=$id')
+        .then((http.Response response) {
+      final dynamic modifierData = json.decode(response.body);
+      if (modifierData != null) {
+        modifier = modifierData;
+      }
+      _isLoading = false;
+      notifyListeners();
+      return modifier;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return modifier;
+    });
+  }
+
   Future<Map<String, dynamic>> authenticate(
       String email, String password, AuthMode _authMode) async {
     String postUrl = _authMode == AuthMode.Login
@@ -593,9 +682,17 @@ class UserModel extends ConnectedRecipesModel {
     if (responseData.containsKey('Token')) {
       message = 'Authentication succeeded!';
       success = true;
-      _authenticatedUser = User(
-          email: email, id: responseData['Id'], token: responseData['Token']);
+
+      getModifier(responseData['Id']).then((Map<String, dynamic> modifier) {
+        _authenticatedUser = User(
+          email: email,
+          id: responseData['Id'],
+          token: responseData['Token'],
+          modifier: modifier,
+        );
+      });
       _userSubject.add(true);
+
       setAuthTimeout(responseData['ExpiresIn']);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['Token']);
@@ -631,11 +728,16 @@ class UserModel extends ConnectedRecipesModel {
       } else {
         final String userEmail = prefs.getString('userEmail');
         final int userId = int.parse(prefs.getString('userId'));
-        _authenticatedUser = User(
-          email: userEmail,
-          id: userId,
-          token: token,
-        );
+
+        getModifier(userId).then((Map<String, dynamic> modifier) {
+          _authenticatedUser = User(
+            email: userEmail,
+            id: userId,
+            token: token,
+            modifier: modifier,
+          );
+        });
+
         _userSubject.add(true);
         final int tokenLifeSpan = parsedExpiryTime.difference(now).inSeconds;
         setAuthTimeout(tokenLifeSpan);
@@ -669,6 +771,9 @@ class DatesModel extends RecipesModel {
   Future<bool> fetchDates() {
     _isLoading = true;
     notifyListeners();
+
+    print("Fetch Dates");
+
     List<Date> fetchedDates = [];
 
     return http
@@ -678,7 +783,15 @@ class DatesModel extends RecipesModel {
       final List<dynamic> calendarData = json.decode(response.body);
       if (calendarData != null) {
         calendarData.forEach((dynamic dateData) {
-          final DateTime dateTime = DateTime.parse(dateData['DateTime']);
+          final DateTime now = DateTime.now();
+          DateTime dateTime = DateTime.parse(dateData['DateTime']);
+
+          //Only show next days event
+          if (now.difference(dateTime).inDays > 0) {
+            int a = (now.difference(dateTime).inDays ~/ 7 + 1) * 7;
+            dateTime = dateTime.add(new Duration(days: a));
+          }
+
           final List<Food> foods = new List<Food>();
 
           dateData['Foods'].forEach((dynamic foodData) {
@@ -691,6 +804,9 @@ class DatesModel extends RecipesModel {
 
           Date date = new Date(dateTime: dateTime, foods: foods);
           fetchedDates.add(date);
+        });
+        fetchedDates.sort((a, b) {
+          return a.dateTime.compareTo(b.dateTime);
         });
         _dates = fetchedDates;
       }
@@ -715,6 +831,83 @@ class DatesModel extends RecipesModel {
 
   Date get getSelectedDate {
     return _dates[_selectedDate];
+  }
+
+  Date get getCurrentDate {
+    var now = new DateTime.now();
+    return _dates.firstWhere((Date date) {
+      return date.dateTime.weekday == now.weekday;
+    }, orElse: () {
+      return null;
+    });
+  }
+}
+
+////////////////////////////////////////SHOP ITEMS MODEL////////////////////////////////////////////
+class ShopItemsModel extends DatesModel {
+  List<ShopItem> _shopItems = [];
+  int _selectedShopItem;
+
+  void addShopItem(ShopItem shopItem) {
+    _shopItems.add(shopItem);
+  }
+
+  List<ShopItem> get getShopItems {
+    return List.from(_shopItems);
+  }
+
+  ShopItem get getShopItem {
+    return _shopItems[_selectedShopItem];
+  }
+
+  void setSelectedShopItem(int index) {
+    _selectedShopItem = index;
+  }
+
+  void toggleBoughtStatus() {
+    final bool isCurrentlyBought = getShopItem.bought;
+    final bool newBoughtStatus = !isCurrentlyBought;
+
+    _shopItems[_selectedShopItem] = ShopItem(
+        bought: newBoughtStatus,
+        name: getShopItem.name,
+        quantity: getShopItem.quantity,
+        image: getShopItem.image);
+
+    notifyListeners();
+  }
+
+  void updateShopItems() {
+    print("Update Shop Items");
+    Map<Ingredient, double> totalIngredientQuantity =
+        new Map<Ingredient, double>();
+    List<ShopItem> shopItems = [];
+
+    _dates.forEach((Date date) {
+      date.foods.forEach((Food food) {
+        food.recipe.ingredients.forEach((Ingredient ingredient) {
+          if (!totalIngredientQuantity.containsKey(ingredient)) {
+            totalIngredientQuantity[ingredient] =
+                getIngredientQuantity(ingredient);
+          } else {
+            totalIngredientQuantity[ingredient] +=
+                getIngredientQuantity(ingredient);
+          }
+        });
+      });
+    });
+
+    totalIngredientQuantity.forEach((Ingredient ingredient, double quantity) {
+      ShopItem shopItem = new ShopItem(
+        bought: false,
+        image: ingredient.image,
+        name: ingredient.name,
+        quantity: quantity.toString() + " " + ingredient.unit,
+      );
+      shopItems.add(shopItem);
+    });
+
+    _shopItems = shopItems;
   }
 }
 
