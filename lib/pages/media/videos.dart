@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_youtube/flutter_youtube.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import '../../widgets/media/video-card.dart';
 import '../../models/recipe.dart';
 import '../../scoped-models/main.dart';
 // import '../../widgets/ui_elements/drawer/logout_list_tile.dart';
@@ -14,23 +14,7 @@ import '../../scoped-models/main.dart';
 // import '../../widgets/ui_elements/drawer/images_list_tile.dart';
 
 class VideosPage extends StatelessWidget {
-  void playYoutubeVideo() {
-    FlutterYoutube.playYoutubeVideoByUrl(
-      apiKey: "AIzaSyAsVjYW1xnpfyv0tKbAbYChqFKThpvWKMY",
-      videoUrl: "https://www.youtube.com/watch?v=fhWaJi1Hsfo",
-      autoPlay: true, //default falase
-      // fullScreen: true
-    );
-  }
 
-  Widget _buildViewVideoButton(
-      BuildContext context, int index, MainModel model) {
-    return IconButton(
-        icon: Icon(Icons.video_label),
-        onPressed: () {
-          playYoutubeVideo();
-        });
-  }
 
   // Widget _buildSideDrawer(BuildContext context) {
   //   return Drawer(
@@ -64,6 +48,22 @@ class VideosPage extends StatelessWidget {
   //   );
   // }
 
+  Widget _buildVideoList(BuildContext context, List<Recipe> recipes) {
+    Widget recipeCards;
+    if (recipes.length > 0) {
+      recipeCards = ListView.builder(
+        itemBuilder: (BuildContext context, int index) =>
+            VideoCard(recipes[index], index),
+        itemCount: recipes.length,
+      );
+    } else {
+      recipeCards = Center(
+        child: Text("No images found, please add some"),
+      );
+    }
+    return recipeCards;
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -77,23 +77,7 @@ class VideosPage extends StatelessWidget {
         ),
         body: ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget widget, MainModel model) {
-            return ListView.builder(
-                itemCount: model.getRecipes.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final Recipe recipe = model.getRecipes[index];
-                  return Column(
-                    children: <Widget>[
-                      ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(recipe.image),
-                        ),
-                        title: Text(recipe.name),
-                        trailing: _buildViewVideoButton(context, index, model),
-                      ),
-                      Divider(),
-                    ],
-                  );
-                });
+            return _buildVideoList(context, model.getRecipes);
           },
         ),
       ),

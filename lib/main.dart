@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import './pages/food/food.dart';
 import './pages/calendar/today.dart';
 import './pages/calendar/calendar.dart';
 import './pages/calendar/calendar_day.dart';
@@ -19,6 +20,7 @@ import './pages/ingredient/ingredients.dart';
 import './pages/ingredient/ingredient.dart';
 import './scoped-models/main.dart';
 import './models/recipe.dart';
+import './models/food.dart';
 import './models/ingredient.dart';
 
 void main() {
@@ -102,19 +104,36 @@ class _MyAppState extends State<MyApp> {
               return recipe.id == recipeId;
             });
 
-            if (pathElements[3] == "Ingredients") {
+            if (pathElements.length < 3) {
+              return MaterialPageRoute<bool>(
+                builder: (BuildContext context) =>
+                    _isAuthenticated ? RecipePage(recipe, _model) : AuthPage(),
+              );
+            } else if (pathElements[3] == "Ingredients") {
               return MaterialPageRoute<bool>(
                 builder: (BuildContext context) => _isAuthenticated
                     ? RecipeIngredientsListPage(recipe)
                     : AuthPage(),
               );
-            } else {
-              return MaterialPageRoute<bool>(
-                builder: (BuildContext context) => _isAuthenticated
-                    ? RecipePage(recipe, _model, pathElements[3])
-                    : AuthPage(),
-              );
             }
+          }
+
+          if (pathElements[1] == 'Food') {
+            final int foodId = int.parse(pathElements[2]);
+
+            Food food;
+            for (var date in _model.getDates) {
+              food = date.foods.firstWhere(
+                  (Food auxFood) => auxFood.id == foodId,
+                  orElse: () => null);
+              if (food != null) {
+                break;
+              }
+            }
+            return MaterialPageRoute<bool>(
+              builder: (BuildContext context) =>
+                  _isAuthenticated ? FoodPage(food, _model) : AuthPage(),
+            );
           }
 
           if (pathElements[1] == 'Ingredient') {

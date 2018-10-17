@@ -18,7 +18,7 @@ class ShoppingListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (model.getShopItems.length < 1) model.updateShopItems();
+    model.updateShopItems();
 
     return WillPopScope(
       onWillPop: () {

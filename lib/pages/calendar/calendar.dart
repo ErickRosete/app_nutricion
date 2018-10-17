@@ -12,23 +12,10 @@ import '../../widgets/calendar/dates.dart';
 // import '../../widgets/ui_elements/drawer/images_list_tile.dart';
 // import '../../widgets/ui_elements/drawer/videos_list_tile.dart';
 
-class CalendarPage extends StatefulWidget {
+class CalendarPage extends StatelessWidget {
   final MainModel model;
 
   CalendarPage(this.model);
-
-  @override
-  State<StatefulWidget> createState() {
-    return _CalendarPageState();
-  }
-}
-
-class _CalendarPageState extends State<CalendarPage> {
-  @override
-  initState() {
-    super.initState();
-    widget.model.fetchDates();
-  }
 
   // Widget _buildSideDrawer(BuildContext context) {
   //   return Drawer(

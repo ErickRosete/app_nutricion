@@ -24,8 +24,7 @@ class CalendarFoodCard extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed<bool>(
-                context, "/Recipe/" + food.recipe.id.toString() + "/${food.timeToEat.split('-')[0]}");
+            Navigator.pushNamed<bool>(context, "/Food/" + food.id.toString());
           },
           child: Container(
             margin: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 0.0),

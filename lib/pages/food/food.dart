@@ -4,23 +4,23 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../../widgets/ui_elements/title_default.dart';
 import '../../widgets/ui_elements/image_with_placeholder.dart';
-import '../../models/recipe.dart';
+import '../../models/food.dart';
 import '../../models/ingredient.dart';
 import '../../scoped-models/main.dart';
 
-class RecipePage extends StatefulWidget {
-  final Recipe recipe;
+class FoodPage extends StatefulWidget {
+  final Food food;
   final MainModel model;
 
-  RecipePage(this.recipe, this.model);
+  FoodPage(this.food, this.model);
 
   @override
   State<StatefulWidget> createState() {
-    return _RecipePageState();
+    return _FoodPageState();
   }
 }
 
-class _RecipePageState extends State<RecipePage> {
+class _FoodPageState extends State<FoodPage> {
   @override
   initState() {
     super.initState();
@@ -30,11 +30,11 @@ class _RecipePageState extends State<RecipePage> {
   List<Widget> getDropdownButtons() {
     List<Widget> dropdownButtons = new List<Widget>();
 
-    for (int i = 0; i < widget.recipe.ingredients.length; i++) {
-      Ingredient ingredient = widget.recipe.ingredients[i];
+    for (int i = 0; i < widget.food.recipe.ingredients.length; i++) {
+      Ingredient ingredient = widget.food.recipe.ingredients[i];
       dropdownButtons.add(
         DropdownButton<Ingredient>(
-          value: ingredient,
+          value: widget.model.getIngredientById(ingredient.id),
           items: widget.model
               .getEquivalentIngredients(ingredient.category)
               .map((Ingredient eqIng) {
@@ -49,7 +49,7 @@ class _RecipePageState extends State<RecipePage> {
           }).toList(),
           onChanged: (selectedIngredient) {
             setState(() {
-              widget.recipe.ingredients[i] = selectedIngredient;
+              widget.food.recipe.ingredients[i] = selectedIngredient;
             });
           },
         ),
@@ -68,17 +68,17 @@ class _RecipePageState extends State<RecipePage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.recipe.name),
+          title: Text(widget.food.timeToEat.split('-')[0]),
           actions: <Widget>[
             ScopedModelDescendant<MainModel>(
               builder: (BuildContext context, Widget child, MainModel model) {
                 return IconButton(
-                  icon: Icon(model.getRecipeById(widget.recipe.id).isFavorite
+                  icon: Icon(model.getRecipeById(widget.food.recipe.id).isFavorite
                       ? Icons.favorite
                       : Icons.favorite_border),
                   color: Colors.red,
                   onPressed: () {
-                    model.setSelectedRecipe(widget.recipe.id);
+                    model.setSelectedRecipe(widget.food.recipe.id);
                     model.toggleRecipeFavoriteStatus();
                     model.setSelectedRecipe(null);
                   },
@@ -94,9 +94,9 @@ class _RecipePageState extends State<RecipePage> {
               width: double.infinity,
               child: Column(
                 children: <Widget>[
-                  ImageWithPlaceholder(widget.recipe.image),
+                  ImageWithPlaceholder(widget.food.recipe.image),
                   SizedBox(height: 10.0),
-                  TitleDefault(widget.recipe.name),
+                  TitleDefault(widget.food.recipe.name),
                   SizedBox(height: 10.0),
                   Container(
                     width: double.infinity,
@@ -131,7 +131,7 @@ class _RecipePageState extends State<RecipePage> {
                         Container(
                           margin: EdgeInsets.all(10.0),
                           child: Text(
-                            widget.recipe.directions,
+                            widget.food.recipe.directions,
                             style:
                                 TextStyle(color: Colors.black, fontSize: 18.0),
                             textAlign: TextAlign.justify,

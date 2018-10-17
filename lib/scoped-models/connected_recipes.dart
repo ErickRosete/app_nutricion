@@ -785,18 +785,45 @@ class DatesModel extends RecipesModel {
         calendarData.forEach((dynamic dateData) {
           final DateTime now = DateTime.now();
           DateTime dateTime = DateTime.parse(dateData['DateTime']);
-
           //Only show next days event
           if (now.difference(dateTime).inDays > 0) {
-            int a = (now.difference(dateTime).inDays ~/ 7 + 1) * 7;
+            int factor = now.weekday == dateTime.weekday ? 0 : 1 ;
+            int a = (now.difference(dateTime).inDays ~/ 7 + factor)* 7;
             dateTime = dateTime.add(new Duration(days: a));
           }
 
           final List<Food> foods = new List<Food>();
 
           dateData['Foods'].forEach((dynamic foodData) {
+            var auxRecipe = getRecipeById(foodData['RecipeId']);
+            List<Ingredient> clonedIngredients = new List<Ingredient>();
+            auxRecipe.ingredients.forEach((Ingredient ingredient) {
+              var auxIngredient = new Ingredient(
+                calories: ingredient.calories,
+                category: ingredient.category,
+                description: ingredient.description,
+                id: ingredient.id,
+                image: ingredient.image,
+                name: ingredient.name,
+                quantity: ingredient.quantity,
+                unit: ingredient.unit,
+                isFavorite: ingredient.isFavorite,
+              );
+              clonedIngredients.add(auxIngredient);
+            });
+
+            var clonedRecipe = Recipe(
+              directions: auxRecipe.directions,
+              id: auxRecipe.id,
+              image: auxRecipe.image,
+              ingredients: clonedIngredients,
+              name: auxRecipe.name,
+              isFavorite: auxRecipe.isFavorite,
+            );
+
             final Food food = Food(
-              recipe: getRecipeById(foodData['RecipeId']),
+              id: foodData['Id'],
+              recipe: clonedRecipe,
               timeToEat: foodData['TimeToEat'],
             );
             foods.add(food);
@@ -879,27 +906,35 @@ class ShopItemsModel extends DatesModel {
 
   void updateShopItems() {
     print("Update Shop Items");
-    Map<Ingredient, double> totalIngredientQuantity =
-        new Map<Ingredient, double>();
+    Map<int, double> totalIngredientQuantity = new Map<int, double>();
     List<ShopItem> shopItems = [];
 
     _dates.forEach((Date date) {
       date.foods.forEach((Food food) {
         food.recipe.ingredients.forEach((Ingredient ingredient) {
-          if (!totalIngredientQuantity.containsKey(ingredient)) {
-            totalIngredientQuantity[ingredient] =
+          if (!totalIngredientQuantity.containsKey(ingredient.id)) {
+            totalIngredientQuantity[ingredient.id] =
                 getIngredientQuantity(ingredient);
           } else {
-            totalIngredientQuantity[ingredient] +=
+            totalIngredientQuantity[ingredient.id] +=
                 getIngredientQuantity(ingredient);
           }
         });
       });
     });
 
-    totalIngredientQuantity.forEach((Ingredient ingredient, double quantity) {
+    totalIngredientQuantity.forEach((int id, double quantity) {
+      var ingredient = getIngredientById(id);
+
+      ShopItem auxShopItem;
+      if (_shopItems.isNotEmpty) {
+        auxShopItem = _shopItems.singleWhere(
+            (ShopItem auxShopItem) => auxShopItem.name == ingredient.name,
+            orElse: () => null);
+      }
+
       ShopItem shopItem = new ShopItem(
-        bought: false,
+        bought: auxShopItem != null ? auxShopItem.bought : false,
         image: ingredient.image,
         name: ingredient.name,
         quantity: quantity.toString() + " " + ingredient.unit,

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import './recipe.dart';
 
 class Food {
+  final int id;
   final Recipe recipe;
   final String timeToEat;
 
   Food({
+    @required this.id,
     @required this.recipe,
     @required this.timeToEat,
   });
