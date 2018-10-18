@@ -302,9 +302,9 @@ class RecipesModel extends ConnectedRecipesModel {
       final List<dynamic> recipeListData = json.decode(response.body);
       if (recipeListData != null) {
         recipeListData.forEach((dynamic recipeData) {
-          recipeData['Image'] = recipeData['image'] == null
+          recipeData['Image'] = recipeData['Image'] == null
               ? 'https://i.blogs.es/36938e/istock-840527124/450_1000.jpg'
-              : recipeData['image'];
+              : recipeData['Image'];
 
           final Recipe recipe = Recipe(
             id: recipeData['Id'],

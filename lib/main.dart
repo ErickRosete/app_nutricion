@@ -62,6 +62,11 @@ class _MyAppState extends State<MyApp> {
           primarySwatch: Colors.green,
           primaryColor: Color.fromARGB(255, 128, 204, 43),
           buttonColor: Colors.greenAccent,
+          primaryTextTheme: TextTheme(
+            title: TextStyle(color: Colors.white),
+          ),
+          primaryIconTheme:
+              Theme.of(context).primaryIconTheme.copyWith(color: Colors.white),
         ),
 //        home: AuthPage(),
 

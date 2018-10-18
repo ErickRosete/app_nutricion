@@ -105,6 +105,21 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
+  Widget _buildLogoImage() {
+    return new Container(
+      margin: EdgeInsets.all(20.0),
+      width: 190.0,
+      height: 190.0,
+      decoration: new BoxDecoration(
+        shape: BoxShape.circle,
+        image: new DecorationImage(
+          fit: BoxFit.fill,
+          image: AssetImage('assets/logo.jpg'),
+        ),
+      ),
+    );
+  }
+
   void _submitForm(Function authenticate) async {
     if (!_formKey.currentState.validate() ||
         (_authMode == AuthMode.Signup && !_formData['acceptTerms'])) return;
@@ -145,60 +160,76 @@ class _AuthPageState extends State<AuthPage> {
         title: Text('Login'),
       ),
       // body: ProductManager(startingProduct:'Food Tester')
-      body: Form(
-        key: _formKey,
-        child: Container(
-          decoration: BoxDecoration(
-            image: _buildBackgroundImage(),
-          ),
-          padding: EdgeInsets.all(10.0),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Container(
-                width: targetWidth,
-                child: Column(
-                  children: <Widget>[
-                    _buildEmailTextField(),
-                    SizedBox(height: 10.0),
-                    _buildPasswordTextField(),
-                    SizedBox(height: 10.0),
-                    _authMode == AuthMode.Signup
-                        ? _buildPasswordConfirmTextField()
-                        : Container(),
-                    _authMode == AuthMode.Signup
-                        ? _buildAcceptSwitch()
-                        : Container(),
-                    SizedBox(height: 10.0),
-                    // FlatButton(
-                    //   child: Text(
-                    //       'Switch to ${_authMode == AuthMode.Login ? 'Signup' : 'Login'}'),
-                    //   onPressed: () {
-                    //     setState(() {
-                    //       _authMode = _authMode == AuthMode.Login
-                    //           ? AuthMode.Signup
-                    //           : AuthMode.Login;
-                    //     });
-                    //   },
-                    // ),
-                    // SizedBox(height: 10.0),
-                    ScopedModelDescendant<MainModel>(
-                      builder: (BuildContext context, Widget child,
-                          MainModel model) {
-                        return model.isLoading
-                            ? Center(child: CircularProgressIndicator())
-                            : RaisedButton(
-                                child: Text(_authMode == AuthMode.Login
-                                    ? 'Login'
-                                    : 'Signup'),
-                                onPressed: () =>
-                                    _submitForm(model.authenticate),
-                              );
-                      },
+      body: Container(
+        height: double.infinity,
+        decoration: BoxDecoration(
+          image: _buildBackgroundImage(),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              _buildLogoImage(),
+              Form(
+                key: _formKey,
+                child: Container(
+                  padding: EdgeInsets.all(10.0),
+                  child: Center(
+                    child: Container(
+                      width: targetWidth,
+                      child: Column(
+                        children: <Widget>[
+                          _buildEmailTextField(),
+                          SizedBox(height: 10.0),
+                          _buildPasswordTextField(),
+                          SizedBox(height: 10.0),
+                          _authMode == AuthMode.Signup
+                              ? _buildPasswordConfirmTextField()
+                              : Container(),
+                          _authMode == AuthMode.Signup
+                              ? _buildAcceptSwitch()
+                              : Container(),
+                          SizedBox(height: 20.0),
+                          // FlatButton(
+                          //   child: Text(
+                          //       'Switch to ${_authMode == AuthMode.Login ? 'Signup' : 'Login'}'),
+                          //   onPressed: () {
+                          //     setState(() {
+                          //       _authMode = _authMode == AuthMode.Login
+                          //           ? AuthMode.Signup
+                          //           : AuthMode.Login;
+                          //     });
+                          //   },
+                          // ),
+                          // SizedBox(height: 10.0),
+                          ScopedModelDescendant<MainModel>(
+                            builder: (BuildContext context, Widget child,
+                                MainModel model) {
+                              return model.isLoading
+                                  ? Center(child: CircularProgressIndicator())
+                                  : RaisedButton(
+                                      color: Theme.of(context).primaryColor,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 50.0, vertical: 10.0),
+                                      child: Text(
+                                        _authMode == AuthMode.Login
+                                            ? 'LOGIN'
+                                            : 'Signup',
+                                        style: TextStyle(
+                                            fontSize: 20.0,
+                                            color: Colors.white),
+                                      ),
+                                      onPressed: () =>
+                                          _submitForm(model.authenticate),
+                                    );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),
