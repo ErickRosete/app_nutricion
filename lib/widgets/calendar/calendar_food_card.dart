@@ -12,7 +12,6 @@ class CalendarFoodCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         bool landscape = MediaQuery.of(context).size.width >=

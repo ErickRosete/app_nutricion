@@ -1,4 +1,4 @@
-package com.example.fluttercourse;
+package com.example.appnutricion;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

@@ -1,5 +1,5 @@
-name: flutter_course
-description: A new Flutter project.
+name: app_nutricion
+description: Nutrition Flutter Application, developed by Erick Rosete.
 
 dependencies:
   flutter:
@@ -15,7 +15,7 @@ dependencies:
   flutter_launcher_icons: ^0.6.1
   side_header_list_view: ^0.0.4
   scrolling_calendar: ^0.2.11
-  flutter_youtube: "^1.1.1"
+  flutter_youtube: "^1.1.4"
   chewie: ^0.7.0
 
 

@@ -15,7 +15,7 @@ import '../models/date.dart';
 import '../models/food.dart';
 
 ////////////////////////////////////////CONNECTED RECIPES MODEL////////////////////////////////////////////
-class ConnectedRecipesModel extends Model {
+mixin ConnectedRecipesModel on Model {
   List<Recipe> _recipes = [];
   List<Ingredient> _ingredients = [];
   int _selectedRecipeId;
@@ -68,7 +68,7 @@ class ConnectedRecipesModel extends Model {
 
 //////////////////////////////////////// RECIPES MODEL////////////////////////////////////////////
 
-class RecipesModel extends ConnectedRecipesModel {
+mixin RecipesModel on ConnectedRecipesModel {
   bool _showRecipesFavorites = false;
 
   List<Recipe> get getRecipes {
@@ -390,7 +390,7 @@ class RecipesModel extends ConnectedRecipesModel {
 
 ////////////////////////////////////////CONNECTED INGREDIENTS MODEL////////////////////////////////////////////
 
-class ConnectedIngredientsModel extends ConnectedRecipesModel {
+mixin ConnectedIngredientsModel on ConnectedRecipesModel {
   int _selectedIngredientId;
 
   Future<bool> addIngredient(
@@ -450,7 +450,7 @@ class ConnectedIngredientsModel extends ConnectedRecipesModel {
 
 ////////////////////////////////////////INGREDIENTS MODEL////////////////////////////////////////////
 
-class IngredientsModel extends ConnectedIngredientsModel {
+mixin IngredientsModel on ConnectedIngredientsModel {
   bool _showIngredientsFavorites = false;
 
   List<Ingredient> get getIngredients {
@@ -611,7 +611,7 @@ class IngredientsModel extends ConnectedIngredientsModel {
 
 ////////////////////////////////////////USER MODEL////////////////////////////////////////////
 
-class UserModel extends ConnectedRecipesModel {
+mixin UserModel on ConnectedRecipesModel {
   Timer _authTimer;
   PublishSubject<bool> _userSubject = PublishSubject();
 
@@ -764,7 +764,7 @@ class UserModel extends ConnectedRecipesModel {
 
 ///////////////////////////////////////////////////////////Date Model/////////////////////////////////////////////////
 
-class DatesModel extends RecipesModel {
+mixin DatesModel on RecipesModel {
   List<Date> _dates = [];
   int _selectedDate;
 
@@ -871,7 +871,7 @@ class DatesModel extends RecipesModel {
 }
 
 ////////////////////////////////////////SHOP ITEMS MODEL////////////////////////////////////////////
-class ShopItemsModel extends DatesModel {
+mixin ShopItemsModel on DatesModel {
   List<ShopItem> _shopItems = [];
   int _selectedShopItem;
 
@@ -948,7 +948,7 @@ class ShopItemsModel extends DatesModel {
 
 /////////////////////////////////////////////////////////Utility Model////////////////////////////////////////////////////
 
-class UtilityModel extends ConnectedRecipesModel {
+mixin UtilityModel on ConnectedRecipesModel {
   bool get isLoading {
     return _isLoading;
   }
